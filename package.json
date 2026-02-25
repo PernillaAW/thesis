@@ -1,0 +1,24 @@
+{
+  "name": "thesis",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PernillaAW/thesis.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PernillaAW/thesis/issues"
+  },
+  "homepage": "https://github.com/PernillaAW/thesis#readme",
+  "dependencies": {
+    "couchbase": "^4.6.1",
+    "express": "^5.2.1",
+    "postgres": "^3.4.8"
+  }
+}
