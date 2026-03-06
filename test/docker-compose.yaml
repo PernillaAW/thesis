@@ -1,0 +1,24 @@
+services:
+  postgres:
+    image: postgres
+    container_name: postgres
+    environment:
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    cpuset: "0,1"
+    
+  app:
+    image: node:18
+    container_name: express-api
+    working_dir: /app
+    command: >
+      sh -c "npm init -y && 
+             npm install express pg && 
+             node server.js"
+    volumes:
+      - ./server.js:/app/server.js
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
