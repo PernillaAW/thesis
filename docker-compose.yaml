@@ -1,5 +1,15 @@
   services:
-    postgres:
+    start:
+      container_name: start
+      build:
+        context: .
+        dockerfile: Dockerfile.dev
+      env_file: ".env"
+      ports:
+        - "3000:3000"
+      depends_on:
+        - db   
+    db:
       profiles: ["postgres"]
       container_name: postgres
       image: postgres
@@ -8,7 +18,7 @@
         - "5432:5432"
       volumes:
         - pgdata:/var/lib/postgresql/data
-        - ./sql/postgreeSQLtables.sql:/docker-encryptionpoint-initdb.d/init_db.sql
+        - ./sql/postgreeSQLtables.sql:/docker-entrypoint-initdb.d/init_db.sql
       healthcheck:
         test: ["CMD-SHELL", "pg_isready -U postgres"]
         interval: 5s
@@ -91,15 +101,7 @@
         timeout: 3s
         retries: 5
 
-    start:
-      container_name: start
-      build:
-        context: .
-        dockerfile: Dockerfile.dev
-      environment:
-        - HOKIDAR_USEPOLLING=true
-      ports:
-        - "4444:4444/udp"
+
 
   volumes:
     pgdata: {}
