@@ -1,10 +1,9 @@
+import postgres from 'postgres';
+import dotenv from 'dotenv';
 
+dotenv.config();
 
-const postgres = require(postgres);
-require('dotenv').config()
-
-async function connectPostgre() {
-    const sql = postgres('postgres://username:password@host:port/database', {
+    const sql = postgres({
         host: string = process.env.DB_GRE_HOST || 'localhost',
         user: string = process.env.DB_GRE_USER || 'postgres',
         password: string = process.env.DB_GRE_PASSWORD || 'root',
@@ -12,9 +11,7 @@ async function connectPostgre() {
         port: 5432
     })
 
-    await sql.connect();
-}
 
-module.exports = { connectPostgre }
+export default sql;
 
 

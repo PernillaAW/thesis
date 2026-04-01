@@ -1,4 +1,4 @@
-const { connectPostgre } = require('./DBConnection')
+import connectPostgre from "../postgreeSQL/DBConnection.js"
 
 
 async function postgreeInsert() {
@@ -8,7 +8,7 @@ async function postgreeInsert() {
     
 }
 
-module.exports = { postgreeInsert }
+export default postgreeInsert();
 
 
 
