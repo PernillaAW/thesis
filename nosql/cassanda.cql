@@ -1,14 +1,24 @@
 CREATE TABLE unoptimized(
     id uuid,
-    severity int,
-    us_state text,
-    description text
+    severity INT,
+    us_state VARCHAR(2),
+    precipitation INT, 
+    windy SMALLINT, 
+    longitude LONG, 
+    latitude LONG, 
+    start_time DATE, 
+    end_time DATE
 )
 
 CREATE TABLE optimized(
     id uuid,
-    severity int,
-    start_time date,
-    end_time date,
+    severity INT,
+    us_state VARCHAR(2),
+    precipitation INT, 
+    windy SMALLINT, 
+    longitude LONG, 
+    latitude LONG, 
+    start_time DATE, 
+    end_time DATE,
     PRIMARY KEY(id)
 )

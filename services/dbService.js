@@ -1,4 +1,4 @@
-import * as db from "../src/postgreeSQL/model.js"
+import * as db from "../src/postgreSQL/model.js"
 export default {
   full_read: db.fullRead,
   five_read: db.fiveRead,
