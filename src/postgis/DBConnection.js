@@ -1,9 +1,8 @@
 import postgres from 'postgres';
 import dotenv from 'dotenv';
+import Postgis from 'postgis';
 
 dotenv.config();
-
-
 /**
  * Connection to the postgre database
  */
@@ -14,9 +13,11 @@ dotenv.config();
         database: string = process.env.DB_GRE_NAME || 'db-name',
         port: 5432
     })
+/**
+ * Updates to GIS extention
+ */
+    const postgis = new Postgis(connectPostgre)
 
 
 
-export default connectPostgre;
-
-
+export default postgis;
