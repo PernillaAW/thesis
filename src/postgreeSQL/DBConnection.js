@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-    const sql = postgres({
+    const connectPostgre = postgres({
         host: string = process.env.DB_GRE_HOST || 'localhost',
         user: string = process.env.DB_GRE_USER || 'postgres',
         password: string = process.env.DB_GRE_PASSWORD || 'root',
@@ -12,6 +12,7 @@ dotenv.config();
     })
 
 
-export default sql;
+
+export default connectPostgre;
 
 
