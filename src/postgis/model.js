@@ -19,7 +19,7 @@ export async function fullRead(table) {
  * @param {valueOne} valueOne specified for search
  * @param {valueTwo} valueTwo specified for search
  */
-export async function fiveRead(table, valueOne) {
+export async function readPartial(table, valueOne) {
     const sql = `SELECT * FROM ${table} WHERE point = $1`
     const arg = [valueOne]
     const result = await postgis.query(sql, arg)

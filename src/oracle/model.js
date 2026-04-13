@@ -18,7 +18,7 @@ async function readAll(table) {
  * @param {valueOne} valueOne specified for search
  * @param {valueTwo} valueTwo specified for search
  */
-async function fiveRead(table, columnOne, columnTwo, valueOne, valueTwo) {
+async function readPartial(table, columnOne, columnTwo, valueOne, valueTwo) {
     const sql = `SELECT * FROM ${table} WHERE ${columnOne} = $1 AND ${columnTwo} = $2`;
     const arg = [valueOne, valueTwo];
     const result = await dbConnectionOracle.execute(sql, arg);

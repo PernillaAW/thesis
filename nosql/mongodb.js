@@ -1,9 +1,10 @@
+
 db.createCollection("optimized", {
     validator: {
         $jsonSchema: {
             bsonType: "object",
-            required: [id],
-            propeties: {
+            required: ["id"],
+            properties: {
                 id: {
                     bsonType: "int"
                 },
@@ -13,6 +14,24 @@ db.createCollection("optimized", {
                 windy: {
                     bsonType: "int"
                 },
+                us_state:{
+                    bsonType: "string"
+                },
+                precipitation: {
+                    bsonType: "double"
+                }, 
+                longitude: {
+                    bsonType:"double"
+                    }, 
+                latitude:{
+                    bsonType:"double"
+                }, 
+                start_time: {
+                    bsonType:"date"
+                }, 
+                end_time: {
+                    bsonType:"date"
+                }
             }
         }
     }
