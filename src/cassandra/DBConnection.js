@@ -9,6 +9,6 @@ const contactPoints = [process.env.CASSANDRA_DATABASE_POINT];
 
 const dataCenter = 'DataCenter';
 
-const client = new cassandra.Client({contactPoints: contactPoints, authProvider: userInfo, localDataCenter: dataCenter});
+const connect = new cassandra.Client({contactPoints: contactPoints, authProvider: userInfo, localDataCenter: dataCenter});
 
-export default client;
+export default connect;

@@ -2,7 +2,7 @@ CREATE TABLE unoptimized(
     id SERIAL PRIMARY KEY,
     severity INT,
     us_state VARCHAR(2),
-    precipitation INT, 
+    precipitation FLOAT, 
     windy SMALLINT, 
     longitude LONG, 
     latitude LONG, 
@@ -15,7 +15,7 @@ CREATE TABLE optimized(
     severity INT,
     us_state VARCHAR(2),
     windy SMALLINT
-    precipitation INT, 
+    precipitation FLOAT, 
     longitude LONG, 
     latitude LONG, 
     start_time DATE, 
