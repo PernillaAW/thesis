@@ -8,10 +8,10 @@ dotenv.config();
  * Connection to the postgre database
  */
     const connectPostgre = postgres({
-        host: string = process.env.DB_GRE_HOST || 'localhost',
-        user: string = process.env.DB_GRE_USER || 'postgres',
-        password: string = process.env.DB_GRE_PASSWORD || 'root',
-        database: string = process.env.DB_GRE_NAME || 'db-name',
+        host: process.env.DB_HOST || 'localhost',
+        user: process.env.DB_USER || 'postgres',
+        password: process.env.POSTGRES_PASSWORD || 'root',
+        database: process.env.POSTGRES_DB || 'db-name',
         port: 5432
     })
 
