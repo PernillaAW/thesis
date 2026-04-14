@@ -17,6 +17,6 @@ function run(database = null){
         return;
     }else{
         couchbaseSetup()
-        preprocessing()
+        preprocessing("data.csv")
     }
 }
