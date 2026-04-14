@@ -1,23 +1,23 @@
 CREATE TABLE unoptimized(
     id SERIAL PRIMARY KEY,
-    severity INT,
-    us_state VARCHAR(2),
-    precipitation FLOAT, 
-    windy SMALLINT, 
-    geo POINT,
-    start_time DATE, 
-    end_time DATE
+    Severity INT,
+    State VARCHAR(2),
+    Precipitation FLOAT, 
+    Windy SMALLINT, 
+    Geo POINT,
+    Start_time DATE, 
+    End_time DATE
 )
 
 CREATE TABLE optimized(
     id SERIAL PRIMARY KEY,
-    severity INT,
-    us_state VARCHAR(2),
-    windy SMALLINT
-    precipitation FLOAT, 
-    geo POINT,
-    start_time DATE, 
-    end_time DATE
+    Severity INT,
+    State VARCHAR(2),
+    Windy SMALLINT
+    Precipitation FLOAT, 
+    Geo POINT,
+    Start_time DATE, 
+    End_time DATE
 )
 CREATE EXTENSION postgis;
-CREATE INDEX severity_idx ON optimized(severity)
+CREATE INDEX Severity_idx ON optimized(Severity)

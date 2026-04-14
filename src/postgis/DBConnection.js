@@ -1,25 +1,23 @@
-import postgres from 'postgres';
 import dotenv from 'dotenv';
 import Postgis from 'postgis';
+import { Client } from "pg";
 
 dotenv.config();
 /**
  * Connection to the postgre database
  */
-    const connectPostgre = postgres({
-        host: string = process.env.DB_GRE_HOST || 'localhost',
-        user: string = process.env.DB_GRE_USER || 'postgres',
-        password: string = process.env.DB_GRE_PASSWORD || 'root',
-        database: string = process.env.DB_GRE_NAME || 'db-name',
-        port: 5432
-    })
-    
+const client = new Client({
+    host: process.env.DB_HOST || '127.0.0.1', 
+    user: process.env.DB_USER  || 'postgres',
+    password: process.env.DB_PASS || 'password',
+    database: process.env.DB_DATABASE || 'db-dev_db',
+    port: 5432
+});
+    await client.connect();
     console.log("postGIS connected run")
 /**
  * Updates to GIS extention
  */
-    const postgis = new Postgis(connectPostgre)
-
-
+    const postgis = new Postgis(client);
 
 export default postgis;

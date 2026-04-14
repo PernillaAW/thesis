@@ -1,4 +1,5 @@
-import MongoClient from 'mongodb';
+import { MongoClient } from 'mongodb';
+
 
 
 const uri = 'mongodb://localhost:27017'

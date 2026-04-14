@@ -1,6 +1,6 @@
-const fs = require('fs');
-const csv = require('csv-parser');
-const { writeFileSync } = require('fs');
+import fs from 'fs';
+import csv from 'csv-parser';
+import { writeFileSync } from 'fs';
 
 const outputRows = [];
 

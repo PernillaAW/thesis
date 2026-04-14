@@ -8,28 +8,28 @@ db.createCollection("optimized", {
                 id: {
                     bsonType: "int"
                 },
-                severity:  {
+                Severity:  {
                     bsonType: "int"
                 },
-                windy: {
+                Windy: {
                     bsonType: "int"
                 },
-                us_state:{
+                State:{
                     bsonType: "string"
                 },
-                precipitation: {
+                Precipitation: {
                     bsonType: "double"
-                }, 
-                longitude: {
+                },
+                Start_Lng: {
                     bsonType:"double"
                     }, 
-                latitude:{
+                Start_Lat:{
                     bsonType:"double"
                 }, 
-                start_time: {
+                Start_time: {
                     bsonType:"date"
                 }, 
-                end_time: {
+                End_time: {
                     bsonType:"date"
                 }
             }
