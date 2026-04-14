@@ -15,7 +15,10 @@ def main():
                                   "curl", 
                                   "-s", 
                                   "-o", 
-                                  "/dev/null", 
+                                  "/dev/null",
+                                  "-X", "POST",
+                                  "-H", "Content-Type: application/json",
+                                  "-d", '{"file":"test","collection":123}', 
                                   "http://localhost:3000/insert"],
                                   capture_output=True,
                                   text=True)
