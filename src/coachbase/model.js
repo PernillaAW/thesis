@@ -1,6 +1,57 @@
-const fs = require('fs')
-const csv = require('csv-parser');
-const  { connectCouchbase } = require('./DBconnection');
+import { connectCouchbase } from "./DBconnection";
+import fs from 'fs';
+import csv from 'csv-parser';
+
+const { cluster, unoptimzedCollection, optimizedCollection } = connectCouchbase
+
+
+class couchbaseModel{
+
+/**
+ * Read all the data from collection.
+ * @param {collection} collection 
+ * @returns 
+ */
+async readAll(collection) {
+    const sql = `SELECT * FROM \`${collection}\``;
+    const result = await cluster.query(sql)
+    return;
+}
+/**
+ * Vertical search one row
+ * @param {collection} collection 
+ * @returns 
+ */
+async readOne(collection) {
+    const sql = `SELECT * FROM \`${collection}\` USE KEY "5000"`;
+    const result = await cluster.query(sql)
+    return;
+}
+
+/**
+ * Partical search of database ~ 5%
+ * @param {collection} collection 
+ * @param {severity} sev 
+ * @param {us state} state 
+ * @returns 
+ */
+async readPartial(collection, sev, state) {
+    const sql = `SELECT * FROM \`${collection}\` WHERE severity = $severity AND us_state = $us_state`;
+    const options = { parameters: { severity: sev, us_state: state } }
+    const result = await cluster.query(sql, options)
+    return;
+    
+}
+/**
+ * Drop the full collection.
+ * @param {collection} collection 
+ * @returns 
+ */
+async drop(collection) {
+    const sql = `DROP COLLECTION \`${collection}\``;
+    const result = await cluster.query(sql)
+    return;
+}
 
 /**This function set up the documents with in the collections unoptimized.
  * It will read cvs file row by row and turn it into a JSON object.
@@ -9,7 +60,7 @@ const  { connectCouchbase } = require('./DBconnection');
  * @param {string} filePath - The path to the CSV file to read.
  * @param {number} [batchSize=1000] - The number of documents to insert per batch.
  */
-async function couchbaseUnoptimizedInsert(filePatch, batchSize = 1000) {
+async couchbaseUnoptimizedInsert(filePatch, batchSize = 1000) {
     const { unoptimizedCollection } = await connectCouchbase();
     let batchUnoptimized = [];
     let count = 0;
@@ -62,7 +113,7 @@ async function couchbaseUnoptimizedInsert(filePatch, batchSize = 1000) {
  * @param {string} filePath - The path to the CSV file to read.
  * @param {number} [batchSize=1000] - The number of documents to insert per batch.
  */
-async function couchbaseOptimizedInsert(filePatch, batchSize = 1000) {
+async couchbaseOptimizedInsert(filePatch, batchSize = 1000) {
     const { optimizedCollection } = await connectCouchbase();
     let batchOptimized = [];
     let count = 0;
@@ -110,6 +161,6 @@ async function couchbaseOptimizedInsert(filePatch, batchSize = 1000) {
         });
 }
 
-module.exports = { couchbaseInsert };
+}
 
-insertFromCSV("");
+export default couchbaseModel

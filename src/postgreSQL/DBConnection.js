@@ -15,6 +15,8 @@ dotenv.config();
         port: 5432
     })
 
+    console.log("postgre connected run")
+
 
 
 export default connectPostgre;

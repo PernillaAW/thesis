@@ -13,6 +13,8 @@ dotenv.config();
         database: string = process.env.DB_GRE_NAME || 'db-name',
         port: 5432
     })
+    
+    console.log("postGIS connected run")
 /**
  * Updates to GIS extention
  */

@@ -1,5 +1,7 @@
-const couchbase = require("couchbase");
-require('dotenv').config()
+import couchbase from "couchbase";
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 /**
  * This function connects to the database and creates the intial buckets.
@@ -10,7 +12,7 @@ async function connectCouchbase() {
         username: process.env.COUCHBASE_ADMINISTRATOR_USERNAME,
         password: process.env.COUCHBASE_ADMINISTRATOR_PASSWORD
 
-    });
+    }).then(()=>{console.log("couchbase connected")});
     
     const unoptimizedBucket = cluster.bucket("unoptimized");
     const unoptimizedCollection = unoptimizedBucket.scope("_default").collection("unoptimizedCollection");
@@ -20,5 +22,6 @@ async function connectCouchbase() {
 
     return { cluster, unoptimizedCollection, optimizedCollection }
 }
+
 
 module.exports = { connectCouchbase }

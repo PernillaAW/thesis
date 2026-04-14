@@ -8,7 +8,7 @@ const outputRows = [];
  * Preprocessing of the cvs to create point.
  * @param {path} path to file
  */
-function preprocessing(path){
+export function preprocessing(path){
     fs.createReadStream(path)
         .pipe(csv())
         .on('data', row => {

@@ -11,4 +11,6 @@ const dataCenter = 'DataCenter';
 
 const connect = new cassandra.Client({contactPoints: contactPoints, authProvider: userInfo, localDataCenter: dataCenter});
 
+connect.connect().then(function (){console.log("Cassandra connected")}) 
+
 export default connect;

@@ -10,4 +10,8 @@ dotenv.config();
             connectionString: process.env.ORACLE_DATABASE_CONNECTION
         }); 
     
+    if(dbConnectionOracle.isHealthy()){
+        console.log("Oracle is connected")
+    }
+    
 export default dbConnectionOracle

@@ -1,10 +1,12 @@
 import connect from "./DBConnection.js"
 
+
+class cassandraModel{
 /**
  * Read full table from database
  * @param {table} table 
  */
-async function readAll(table) {
+async readAll(table) {
     const sql = `SELECT * FROM ${table}`;
     const result = await connect.execute(sql);
 };
@@ -17,7 +19,7 @@ async function readAll(table) {
  * @param {valueOne} valueOne specified for search
  * @param {valueTwo} valueTwo specified for search
  */
-async function readPartial(table, columnOne, columnTwo, valueOne, valueTwo) {
+async readPartial(table, columnOne, columnTwo, valueOne, valueTwo) {
     const sql = `SELECT * FROM ${table} WHERE ${columnOne} = ? AND ${columnTwo} = ?`;
     const arg = [valueOne, valueTwo];
     const result = await connect.execute(sql, arg);
@@ -27,7 +29,7 @@ async function readPartial(table, columnOne, columnTwo, valueOne, valueTwo) {
  * Select single row based on id
  * @param {table} table 
  */
-async function readOne(table) {
+async readOne(table) {
     const sql = `SELECT * FROM ${table} WHERE id = 5000`
     const result = await connect.execute(sql)
     
@@ -36,7 +38,11 @@ async function readOne(table) {
  * Delete the table and release memory space.
  * @param {table} table 
  */
-async function dropTable(table) {
+async dropTable(table) {
     const sql = `DROP TABLE ${table}`
     const result = await connect.execute(sql);
 }
+
+}
+
+export default cassandraModel

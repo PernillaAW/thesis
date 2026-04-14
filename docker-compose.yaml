@@ -34,6 +34,7 @@
         - "5431:1521"
       volumes:
         - oracledata:opt/oracle/oradata
+        - ./sql/oracletables.sql:/docker-entrypoint-initdb.d
       healthcheck:
         #test here
         interval: 5s
@@ -49,6 +50,7 @@
         - "5433:5432"
       volumes:
         - postgisdata:/var/lib/postgresql/data
+        - ./sql/postGIStables.sql:/docker-entrypoint-initdb.d/init_db.sql
       healthcheck:
         test: ["CMD-SHELL", "pg_isready -U postgres"]
         interval: 5s
@@ -64,7 +66,7 @@
         - "27017:27017"
       volumes:
         - mongodbdata:/data/db
-        - ./nosql/mongodb:/docker-entrypoint-initdb.d
+        - ./nosql/mongodb.js:/docker-entrypoint-initdb.d
       healthcheck:
         test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
         interval: 5s
