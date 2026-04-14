@@ -1,15 +1,18 @@
   services:
     start:
+      cpuset: "1" #only use cpu core 1
       container_name: start
       build:
         context: .
         dockerfile: Dockerfile.dev
       env_file: ".env"
       ports:
-        - "3000:3000"
-      depends_on:
-        - db   
-    db:
+        - "3000:3000" 
+      volumes:
+        - ./:/app
+        - /app/node_modules
+        - /var/run/dbus:/var/run/dbus
+    postgres:
       profiles: ["postgres"]
       container_name: postgres
       image: postgres

@@ -16,7 +16,7 @@ function run(database = null){
     if(!database){
         return;
     }else{
-    couchbaseSetup()
-    preprocessing()
+        couchbaseSetup()
+        preprocessing()
     }
 }
