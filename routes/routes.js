@@ -16,26 +16,29 @@ const cassandra = new cassandraModel();
 const couchDB = new couchbaseModel();
 
 routes.post("/insert", async (req, res)=>{
-    const result = await pg.insert();
+    const result = await pg.insert(req.params.file, req.params.collection);
+    //const result = await couchDB.couchbaseOptimizedInsert(req.params.file);
+    //const result = await couchDB.couchbaseUnoptimizedInsert(req.params.file);
 })
 
 routes.post("/read_all", async (req, res) => {
-    const result = await pg.readAll();
+    const result = await pg.readAll(req.params.collection);
     res.json(result);
 })
 
 routes.post("/read_partial", async (req, res) => {
-    const result = await pg.readPartial ({ids: req.params.ids});
+    const result = await pg.readPartial (req.params.collection, req.params.columnOne, req.params.columnTwo, req.params.valueOne, req.params.valueTwo);
+    //const result = await postgis.readPartial(req.params.collection, req.params.valueOne)
     res.json(result);
 })
 
 routes.post("/read_one", async (req, res) => {
-    const result = await pg.readOne({id: req.params.id});
+    const result = await pg.readOne(req.params.collection);
     res.json(result);
 })
 
 routes.post("/drop", async (req, res) => {
-    const result = await pg.drop(req.body);
+    const result = await pg.drop(req.params.collection);
     res.json(result);
 })
 

@@ -24,7 +24,7 @@ async drop(collection) {
     await databaseCollection.drop()
     
 }
-async insert(collection) {
+async insert(filePatch, collection) {
     const databaseCollection = database.collection(collection)
     const result = [];
 

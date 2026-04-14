@@ -35,9 +35,9 @@ async readOne(collection) {
  * @param {us state} state 
  * @returns 
  */
-async readPartial(collection, sev, state) {
-    const sql = `SELECT * FROM \`${collection}\` WHERE severity = $severity AND us_state = $us_state`;
-    const options = { parameters: { severity: sev, us_state: state } }
+async readPartial(collection, columnOne, columnTwo, valueOne, valueTwo) {
+    const sql = `SELECT * FROM \`${collection}\` WHERE \`${columnOne}\` = $columnOne AND \`${columnTwo}\` = $columnTwo`;
+    const options = { parameters: { [columnOne]: valueOne , [columnTwo]: valueTwo } }
     const result = await cluster.query(sql, options)
     return;
     
