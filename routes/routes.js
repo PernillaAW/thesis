@@ -1,10 +1,10 @@
 import express from 'express';
-import couchbaseModel from '../src/coachbase/model';
-import cassandraModel from '../src/cassandra/model';
-import mongodbModel from '../src/mongoDB/model';
-import oracleModel from '../src/oracle/model';
-import postgisModel from '../src/postgis/model';
-import postgreModel from '../src/postgreSQL/model';
+import couchbaseModel from '../src/coachbase/model.js';
+import cassandraModel from '../src/cassandra/model.js';
+import mongodbModel from '../src/mongoDB/model.js';
+import oracleModel from '../src/oracle/model.js';
+import postgisModel from '../src/postgis/model.js';
+import postgreModel from '../src/postgreSQL/model.js';
 
 const routes = express.Router();
 

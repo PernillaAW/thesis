@@ -1,4 +1,4 @@
-import database from "./DBConnection";
+import database from "./DBConnection.js";
 import fs from "fs";
 import csv from "csv-parser";
 

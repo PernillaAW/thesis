@@ -1,4 +1,4 @@
-import postgis from "./DBConnection";
+import postgis from "./DBConnection.js";
 
 
 class postgisModel{
