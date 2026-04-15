@@ -47,7 +47,7 @@ class postgreModel{
     async delete(table) {
         
         const client = await connectPostgre();
-        const sql = TRUNCATE TABLE ${table}
+        const sql = `TRUNCATE TABLE ${table}` 
         const result = await client.query(sql)
         return true;
     }; 
