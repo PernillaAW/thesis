@@ -12,11 +12,6 @@ app.use('/', routes);
 
 app.listen(3000, () => console.log(`Server running on 3000`));
 
-function run(database = null){
-    if(!database){
-        return;
-    }else{
-        couchbaseSetup()
-        preprocessing("data.csv")
-    }
-}
+
+//couchbaseSetup()
+//preprocessing("data.csv")

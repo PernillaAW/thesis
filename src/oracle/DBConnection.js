@@ -3,8 +3,10 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-
-    const dbConnectionOracle = await OracleDB.getConnection({
+export async function dbConnectionOracle() {
+    
+    try{
+        const dbConnectionOracle = await OracleDB.getConnection({
             user: process.env.ORACLE_DATABASE_USER, 
             password: process.env.ORACLE_DATABASE_PASSWORD, 
             connectionString: process.env.ORACLE_DATABASE_CONNECTION
@@ -13,5 +15,8 @@ dotenv.config();
     if(dbConnectionOracle.isHealthy()){
         console.log("Oracle is connected")
     }
-    
-export default dbConnectionOracle
+}catch(e){
+    console.error("error with oracle connection", e)
+}
+}    
+
