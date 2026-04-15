@@ -1,4 +1,4 @@
-CREATE TABLE unoptimized(
+CREATE TABLE IF NOT EXISTS unoptimized(
     id SERIAL PRIMARY KEY,
     Severity INT,
     State VARCHAR(2),
@@ -10,7 +10,7 @@ CREATE TABLE unoptimized(
     End_time DATE
 );
 
-CREATE TABLE optimized(
+CREATE TABLE IF NOT EXISTS optimized(
     id SERIAL PRIMARY KEY,
     Severity INT,
     State VARCHAR(2),

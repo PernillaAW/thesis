@@ -12,18 +12,21 @@ export function preprocessing(path){
     fs.createReadStream(path)
         .pipe(csv())
         .on('data', row => {
-            const point = `(${row.longitude},${row.latitude})`;
+            const Geo_text = `POINT(${row.Start_Lng} ${row.Start_Lat})`;
             outputRows.push([
-                row.severity,
-                row.us_state,
-                row.precipitation,
-                row.windy,
-                point,
-                row.start_time,
-                row.end_time
+                row.Severity,
+                row.State,
+                row.Precipitation,
+                row.Windy,
+                `"${Geo_text}"`,
+                row.Start_time,
+                row.End_time
             ].join(','));
         })
         .on('end', () => {
-        writeFileSync('postgis.csv', outputRows.join('\n'));
+            const headers = ["Severity", "State", "Precipitation", "Windy", "Geo_text", "Start_time", "End_time"]
+            outputRows.unshift(headers.join(','));
+            writeFileSync('postgis.csv', outputRows.join('\n'));
+            console.log("file done")
         });
 }

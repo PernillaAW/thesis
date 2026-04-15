@@ -9,7 +9,7 @@ dotenv.config();
 export async function postgisconnect() {
     try{
         const client = new Client({
-            host: process.env.DB_HOST || '127.0.0.1', 
+            host: 'postgis', 
             user: process.env.DB_USER  || 'postgres',
             password: process.env.DB_PASS || 'password',
             database: process.env.DB_DATABASE || 'db-dev_db',
@@ -21,7 +21,7 @@ export async function postgisconnect() {
     * Updates to GIS extention
     */
         const postgis = new Postgis(client);
-        return postgis
+        return { client, postgis }
     }catch(e){
         console.error("postGIS connection failed", e)
     }

@@ -56,6 +56,7 @@
       volumes:
         - postgisdata:/var/lib/postgresql/data
         - ./sql/postGIStables.sql:/docker-entrypoint-initdb.d/init_db.sql
+        - .:/postgis
       healthcheck:
         test: ["CMD-SHELL", "pg_isready -U postgres"]
         interval: 5s

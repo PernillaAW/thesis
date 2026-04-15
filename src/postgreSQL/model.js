@@ -6,8 +6,10 @@ class postgreModel{
     * @param {table} table 
     */
     async readAll(table) {
+        const client = await connectPostgre();
         const sql = `SELECT * FROM ${table}`
-        const result = await connectPostgre.query(sql)
+        const result = await client.query(sql)
+        return true;
     };
 
     /**
@@ -19,9 +21,11 @@ class postgreModel{
     * @param {valueTwo} valueTwo specified for search
     */
     async readPartial(table, columnOne, columnTwo, valueOne, valueTwo) {
+        const client = await connectPostgre();
         const sql = `SELECT * FROM ${table} WHERE ${columnOne} = $1 AND ${columnTwo} = $2`
         const arg = [valueOne, valueTwo]
-        const result = await connectPostgre.query(sql, arg)
+        const result = await client.query(sql, arg)
+        return true;
     };
 
     /**
@@ -29,19 +33,24 @@ class postgreModel{
     * @param {table} table 
     */
     async readOne(table) {
+        
+        const client = await connectPostgre();
         const sql = `SELECT * FROM ${table} WHERE id = 5000`
-        const result = await connectPostgre.query(sql)
+        const result = await client.query(sql)
+        return true;
     };
 
     /**
     * Drop the full table
     * @param {table} table 
     */
-    async drop(table) {
-        const sql = `DROP TABLE ${table}`
-        const result = await connectPostgre.query(sql)
+    async delete(table) {
+        
+        const client = await connectPostgre();
+        const sql = TRUNCATE TABLE ${table}
+        const result = await client.query(sql)
+        return true;
     }; 
-
 
     /**
     * Insert the cvs file to database
@@ -49,12 +58,12 @@ class postgreModel{
     * @param {table} table 
     */
     async insert(path, table) {
-        const copySQl = `COPY ${table}(Severity, State, Precipitation, Windy, Start_Lng, Start_Lat, Start_time, End_time)
-        FROM $1 
-        DELIMITER ',' 
-        CSV HEADER)`;
-        const arg = [path]
-        await connectPostgre.query(copySQl, arg)
+        const client = await connectPostgre();
+        const copySQl = `COPY ${table} (severity, state, precipitation, windy, Start_Lng, Start_Lat, start_time, end_time) 
+          FROM '/data/dataTwentyFive.csv' 
+          WITH (FORMAT csv, HEADER true)`;
+        await client.query(copySQl, arg)
+        return true;
     }
 }
 
