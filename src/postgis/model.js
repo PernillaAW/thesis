@@ -1,4 +1,4 @@
-import postgis from "./DBConnection.js";
+import { postgisconnect } from "./DBConnection.js";
 
 
 
@@ -9,7 +9,7 @@ class postgisModel{
     */
     async readAll(table) {
         const sql = `SELECT * FROM ${table}`
-        const result = await postgis.query(sql)
+        const result = await postgisconnect.query(sql)
     };
 
     /**
@@ -23,7 +23,7 @@ class postgisModel{
     async readPartial(table, valueOne) {
         const sql = `SELECT * FROM ${table} WHERE point = $1`
         const arg = [valueOne]
-        const result = await postgis.query(sql, arg)
+        const result = await postgisconnect.query(sql, arg)
     };
 
     /**
@@ -32,7 +32,7 @@ class postgisModel{
     */
     async readOne(table) {
         const sql = `SELECT * FROM ${table} WHERE id = 5000`
-        const result = await postgis.query(sql)
+        const result = await postgisconnect.query(sql)
     };
 
     /**
@@ -41,7 +41,7 @@ class postgisModel{
     */
     async drop(table) {
         const sql = `DROP TABLE ${table}`
-        const result = await postgis.query(sql)
+        const result = await postgisconnect.query(sql)
     };
 
     /**
@@ -55,7 +55,7 @@ class postgisModel{
         DELIMITER ',' 
         CSV HEADER)`;
         const arg = [path]
-        await postgis.query(copySQl, arg)
+        await postgisconnect.query(copySQl, arg)
     } 
 }
 

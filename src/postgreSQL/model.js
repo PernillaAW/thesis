@@ -1,4 +1,4 @@
-import connectPostgre from "./DBConnection.js";
+import { connectPostgre } from "./DBConnection.js";
 
 class postgreModel{
     /**

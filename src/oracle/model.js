@@ -1,4 +1,4 @@
-import dbConnectionOracle from "./DBConnection.js"
+import { dbConnectionOracle } from "./DBConnection.js"
 
 
 class oracleModel{

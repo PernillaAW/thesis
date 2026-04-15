@@ -1,4 +1,4 @@
-import connect from "./DBConnection.js"
+import { cassandraConnect } from "./DBConnection.js"
 
 
 class cassandraModel{
@@ -8,7 +8,7 @@ class cassandraModel{
     */
     async readAll(table) {
         const sql = `SELECT * FROM ${table}`;
-        const result = await connect.execute(sql);
+        const result = await cassandraConnect.execute(sql);
     };
 
     /**
@@ -22,7 +22,7 @@ class cassandraModel{
     async readPartial(table, columnOne, columnTwo, valueOne, valueTwo) {
         const sql = `SELECT * FROM ${table} WHERE ${columnOne} = ? AND ${columnTwo} = ?`;
         const arg = [valueOne, valueTwo];
-        const result = await connect.execute(sql, arg);
+        const result = await cassandraConnect.execute(sql, arg);
     };
 
     /**
@@ -31,7 +31,7 @@ class cassandraModel{
     */
     async readOne(table) {
         const sql = `SELECT * FROM ${table} WHERE id = 5000`
-        const result = await connect.execute(sql)
+        const result = await cassandraConnect.execute(sql)
     }
     /**
     * Delete the table and release memory space.
@@ -39,7 +39,7 @@ class cassandraModel{
     */
     async dropTable(table) {
         const sql = `DROP TABLE ${table}`
-        const result = await connect.execute(sql);
+        const result = await cassandraConnect.execute(sql);
     }
     /**
     * Insert the cvs file to database
@@ -53,7 +53,7 @@ class cassandraModel{
         CSV HEADER)`;
         const arg = [path];
 
-        await client.execute(copySQl, arg);
+        await cassandraConnect.execute(copySQl, arg);
 }
 
 }
