@@ -33,8 +33,9 @@
         retries: 5
 
     oracle:
-      image: gvenzl/oracle-xe:21-slim
+      profiles: ["oracle"]
       container_name: oracle
+      image: gvenzl/oracle-xe:21-slim
       environment:
         ORACLE_PASSWORD: password
         APP_USER: appuser
@@ -42,6 +43,7 @@
       ports:
         - "1521:1521"
       volumes:
+        - .:/data
         - oracledb:/opt/oracle/oradata
         - ./sql/oracletables:/container-entrypoint-initdb.d
       healthcheck:
