@@ -18,7 +18,7 @@ export async function connectPostgre() {
             port: 5432
         })
         await client.connect();
-
+        console.log("connect to post..")
         return client;
     }catch(e){
         console.error("error with postgre connection", e)

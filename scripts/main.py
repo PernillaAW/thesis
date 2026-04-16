@@ -5,6 +5,7 @@ import time
 def main():
     resultList = []
    #for i in range(9):
+
     resultInsert = subprocess.run (["sudo", 
                               "perf", 
                               "stat", 
@@ -20,12 +21,13 @@ def main():
                               "-X", 
                               "POST",
                               "-H", "Content-Type: application/json",
-                              "-d", '{"file":"postgis/postgis.csv","collection":"unoptimized"}',
+                              "-d", '{"collection":"unoptimized"}',
                               "http://localhost:3000/insert"],
                               capture_output=True,
                               text=True)
     resultList.append(resultInsert)
     print(1)
+    
     #time.sleep(300)
     resultReadAll = subprocess.run (["sudo", 
                               "perf", 
@@ -48,6 +50,7 @@ def main():
                               text=True)
     resultList.append(resultReadAll)
     print(2)
+   
     #time.sleep(300)
     resultReadPartial = subprocess.run (["sudo", 
                               "perf", 
@@ -93,6 +96,7 @@ def main():
     resultList.append(resultReadOne)
     print(4)
     #time.sleep(300)
+    
     resultDelete = subprocess.run (["sudo", 
                               "perf", 
                               "stat", 
@@ -114,12 +118,9 @@ def main():
                               text=True)
     resultList.append(resultDelete)
     print(5)
-
     for i in resultList:
         print(i)
 
 if __name__ == "__main__":
     main();
     
-
-

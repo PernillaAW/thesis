@@ -1,6 +1,7 @@
 import { mongoDatabase } from "./DBConnection.js";
 import fs from "fs";
 import csv from "csv-parser";
+import { resolve } from "dns";
 
 class mongodbModel{
 
@@ -9,8 +10,11 @@ class mongodbModel{
     * @param {table} table 
     */
     async readAll(collection) {
-        const databaseCollection = mongoDatabase.collection(collection)
-        const result = await databaseCollection.find({});    
+        const db = await mongoDatabase();
+        const databaseCollection = db.collection(collection);
+        const result = await databaseCollection.find({}).toArray();   
+        console.log("READ ALL", result[10]) 
+        return result;
     }
 
     /**
@@ -22,9 +26,13 @@ class mongodbModel{
     * @param {valueTwo} valueTwo specified for search
     */
     async readPartial(collection, columnA, columnB, valueA, valueB) {
-        const databaseCollection = mongoDatabase.collection(collection) 
-        const query = { [columnA]: {valueA}, [columnB]: {valueB} }
-        const result = databaseCollection.find(query)
+        console.log(columnA, columnB, valueA, valueB)
+        const db = await mongoDatabase();
+        const databaseCollection = db.collection(collection) 
+        const query = { [columnA]: valueA, [columnB]: valueB }
+        const result = await databaseCollection.find(query).toArray();
+        console.log("READ PART", result[10])
+        return result;
     }
 
     /**
@@ -32,17 +40,23 @@ class mongodbModel{
     * @param {table} table 
     */
     async readOne(collection) {
-        const databaseCollection = mongoDatabase.collection(collection) 
-        const result = await databaseCollection.findOne({id: 5000})
+        const db = await mongoDatabase();
+        const databaseCollection = db.collection(collection) 
+        const result = await databaseCollection.findOne({id: 5000});
+        console.log("READ PART", result)
+        return result;
     }
 
     /**
     * Drop the full table
     * @param {table} table 
     */
-    async drop(collection) {
-        const databaseCollection = mongoDatabase.collection(collection) 
-        await databaseCollection.drop()
+    async delete(collection) {
+        const db = await mongoDatabase();
+        const databaseCollection = db.collection(collection) 
+        const result = await databaseCollection.drop()
+        console.log("DELETE", result)
+        return result;
     
     }
 
@@ -51,13 +65,30 @@ class mongodbModel{
     * @param {path} path to file
     * @param {table} table 
     */
-    async insert(filePath, collection) {
-        const databaseCollection = mongoDatabase.collection(collection)
+    async insert(collection) {
+        const filePath = '/data/dataTwentyFive.csv';
+        const db = await mongoDatabase();
+        const databaseCollection = db.collection(collection)
+        let count = 0;
         const result = [];
 
-        fs.createReadStream(filePath).pipe(csv()).on("data", (data) => result.push(data)).on("end", async () =>{
-            await databaseCollection.inserMany(result);
-            await databaseCollection.close()
+        return new Promise((resolve, rejuct) => {
+            fs.createReadStream(filePath)
+            .pipe(csv())
+            .on("data", (data) => {
+                data.id = count++
+                result.push(data)
+
+            })
+            .on("end", async () =>{
+                try {
+                    const res = await databaseCollection.insertMany(result);
+                    resolve(res);
+                }catch(e){
+                    console.error("Error when inserting many in MongodbDB", e)
+                }
+        })
+
         })
     }
 }

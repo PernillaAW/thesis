@@ -57,7 +57,7 @@ class postgisModel{
     */
     async delete(table) {
         const { client, postgis } = await postgisconnect();
-        const sql = `TRANCATE TABLE ${table}`
+        const sql = `TRANCATE TABLE ${table} RESTART IDENTITY`
         const result = await client.query(sql)
         return true;
     };

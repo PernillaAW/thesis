@@ -1,4 +1,4 @@
-import { connectCouchbase } from "./DBconnection"
+import { connectCouchbase } from "./DBconnection.js"
 
 
 /**
