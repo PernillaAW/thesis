@@ -9,9 +9,16 @@ const app = express();
 app.use(express.json());
 app.use('/', routes);
 
+async function start() {
+    await couchbaseSetup();
+    console.log("Väntar 5 sekunder på att hinkarna ska stabiliseras...");
+    await new Promise(resolve => setTimeout(resolve, 5000));
+    console.log("CB SETUP DONE!");
 
-app.listen(3000, () => console.log(`Server running on 3000`));
+    app.listen(3000, () => console.log(`Server running on 3000`));
+}
+
+start();
 
 
-//couchbaseSetup()
 //preprocessing("data.csv")

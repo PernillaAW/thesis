@@ -8,7 +8,7 @@ CREATE TABLE unoptimized(
     Start_Lat LONG, 
     Start_time DATE, 
     End_time DATE
-)
+);
 
 CREATE TABLE optimized(
     id uuid,

@@ -1,6 +1,5 @@
   services:
     start:
-      cpuset: "1" #only use cpu core 1
       container_name: start
       build:
         context: .
@@ -106,18 +105,32 @@
       profiles: ["couchbase"]
       container_name: couchbase
       image: couchbase:enterprise-8.0.0
-      env_file: ".env"
+      env_file: 
+        - ".env"
       ports:
         - "8091:8091"
         - "11210:11210"
       volumes:
+        - .:/data
         - couchbasedata:/opt/couchbase/var
       healthcheck:
         test: ["CMD", "curl", "-f", "http://localhost:8091/pools"]
-        interval: 5s
-        timeout: 3s
-        retries: 5
-
+        interval: 10s
+        timeout: 5s
+        retries: 15
+        start_period: 60s
+    
+    couchbase-init:
+      profiles: ["couchbase"]
+      image: couchbase:enterprise-8.0.0
+      depends_on:
+        couchbase:
+          condition: service_healthy
+      env_file: 
+        - ".env"
+      volumes:
+        - ./couchbase-init.sh:/init.sh
+      entrypoint: ["/bin/bash", "/init.sh"]
 
 
   volumes:

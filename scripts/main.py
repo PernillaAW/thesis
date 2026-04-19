@@ -3,10 +3,9 @@ import time
 
 
 def main():
-    resultList = []
    #for i in range(9):
-
-    resultInsert = subprocess.run (["sudo", 
+    resultList = []
+    """     resultInsert = subprocess.run (["sudo", 
                               "perf", 
                               "stat", 
                               "-C", 
@@ -25,7 +24,8 @@ def main():
                               "http://localhost:3000/insert"],
                               capture_output=True,
                               text=True)
-    resultList.append(resultInsert)
+    resultList.append(resultInsert) """
+    
     print(1)
     
     #time.sleep(300)
@@ -44,13 +44,13 @@ def main():
                               "-X", 
                               "POST",
                               "-H", "Content-Type: application/json",
-                              "-d", '{"collection":"unoptimized"}',
+                              "-d", '{"collection":"optimized"}',
                               "http://localhost:3000/read_all"],
                               capture_output=True,
                               text=True)
     resultList.append(resultReadAll)
     print(2)
-   
+    """
     #time.sleep(300)
     resultReadPartial = subprocess.run (["sudo", 
                               "perf", 
@@ -117,6 +117,7 @@ def main():
                               capture_output=True,
                               text=True)
     resultList.append(resultDelete)
+    """
     print(5)
     for i in resultList:
         print(i)

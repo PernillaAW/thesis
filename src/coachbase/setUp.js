@@ -1,4 +1,4 @@
-import { connectCouchbase } from "./DBconnection.js"
+import { getCouchbase } from "./DBconnection.js"
 
 
 /**
@@ -7,13 +7,31 @@ import { connectCouchbase } from "./DBconnection.js"
  * Optimised has primary index and seconder index on severity and us_state.
  */
 export async function couchbaseSetup() {
-    const { cluster } = await connectCouchbase();
+    const { cluster } = await getCouchbase();
 
-    await cluster.query(`CREATE PRIMARY INDEX IF NOT EXIST ON \`unoptimizedBucket\``);
+    await waitForCouchbase(cluster);
+
+    await cluster.query("CREATE PRIMARY INDEX  IF NOT EXISTS ON unoptimized");
 
     
-    await cluster.query(`CREATE PRIMARY INDEX IF NOT EXISTS ON \`optimizedBucket\``);
-
-    await cluster.query(`CREATE INDEX idx_Severity_State ON \`optimizedBucket\`(\`Severity\`, \`State\`) WHERE \`type\` = "optimized"`);
+    await cluster.query(`CREATE PRIMARY INDEX IF NOT EXISTS ON \`optimized\``);
 }
 
+
+async function waitForCouchbase(cluster) {
+    let tries = 20;
+
+    while (tries > 0) {
+        try {
+            await cluster.query("SELECT 1;");
+            console.log("Couchbase Query service is ready");
+            return;
+        } catch (e) {
+            console.log("Waiting for Couchbase Query service...");
+            tries--;
+            await new Promise(res => setTimeout(res, 2000));
+        }
+    }
+
+    throw new Error("Couchbase never became ready");
+}

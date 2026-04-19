@@ -1,8 +1,8 @@
-import { connectCouchbase } from "./DBconnection.js";
+import { getCouchbase } from "./DBconnection.js";
 import fs from 'fs';
 import csv from 'csv-parser';
 
-const { cluster, unoptimzedCollection, optimizedCollection } = connectCouchbase
+const { cluster, unoptimzedCollection, optimizedCollection } = await getCouchbase()
 
 
 class couchbaseModel{
@@ -13,8 +13,15 @@ class couchbaseModel{
     * @returns 
     */
     async readAll(collection) {
-        const sql = `SELECT * FROM \`${collection}\``;
-        const result = await cluster.query(sql)
+        const { cluster } = await getCouchbase();
+        const sql = `SELECT b.* FROM \`${collection}\` b`;
+        await cluster.query(`
+    SELECT 1 FROM system:indexes 
+    WHERE keyspace_id = "${collection}" 
+    AND state = "online"
+`);
+        const result = await cluster.query(sql, {timeout: 60000})
+        console.log(result.rows[1])
         return;
     }
     /**
@@ -24,7 +31,7 @@ class couchbaseModel{
     */
     async readOne(collection) {
         const sql = `SELECT * FROM \`${collection}\` USE KEY "5000"`;
-        const result = await cluster.query(sql)
+        const result = await connectCouchbase.query(sql)
         return;
     }
 
@@ -38,7 +45,7 @@ class couchbaseModel{
     async readPartial(collection, columnOne, columnTwo, valueOne, valueTwo) {
         const sql = `SELECT * FROM \`${collection}\` WHERE \`${columnOne}\` = $columnOne AND \`${columnTwo}\` = $columnTwo`;
         const options = { parameters: { [columnOne]: valueOne , [columnTwo]: valueTwo } }
-        const result = await cluster.query(sql, options)
+        const result = await connectCouchbase.query(sql, options)
         return;
     }
     /**
@@ -48,7 +55,7 @@ class couchbaseModel{
     */
     async drop(collection) {
         const sql = `DROP COLLECTION \`${collection}\``;
-        const result = await cluster.query(sql)
+        const result = await connectCouchbase.query(sql)
         return;
     }
 
@@ -101,56 +108,100 @@ class couchbaseModel{
                 }
             });
         }
-        /**This function set up the documents with in the collections optimized.
-         * It will read cvs file row by row and turn it into a JSON object.
-         * The documents will load to database in map structre (key, value).
-         * It will load in batches of 1000 or less. 
-         * @param {string} filePath - The path to the CSV file to read.
-         * @param {number} [batchSize=1000] - The number of documents to insert per batch.
-         */
-        async couchbaseOptimizedInsert(filePatch, batchSize = 1000) {
-            let batchOptimized = [];
-            let count = 0;
+    /**This function set up the documents with in the collections optimized.
+     * It will read cvs file row by row and turn it into a JSON object.
+     * The documents will load to database in map structre (key, value).
+     * It will load in batches of 1000 or less. 
+     * @param {string} filePath - The path to the CSV file to read.
+     * @param {number} [batchSize=1000] - The number of documents to insert per batch.
+     */
 
-            fs.createReadStream(filePatch)
-                .pipe(csv())
-                .on('data', (row) => {
-        
-                    const optimized = {
-                        type: 'optimized',
-                        id: `${count}`,
-                        Severity: row.Severity,
-                        State: row.State,
-                        Precipitation: row.Precipitation,
-                        Windy: row.Windy,
-                        Start_Lng: row.Start_Lng,
-                        Start_Lat: row.Start_Lat,
-                        Start_time: row.Start_time,
-                        End_time: row.End_time
-                    };
-                    batchOptimized.push({key:optimized.id, value: optimized })
-            
-                    count++;
 
-                    if(batchOptimized.length >= batchSize) {
-                        const batchCopyOptimized = [...batchOptimized];
-                        batchOptimized = [];
-                        fs.pause();
-                        Promise.all([
-                            Promise.all(batchCopyOptimized.map(doc => optimizedCollection.upsert(doc.key, doc.value)))    
-                        ]).then(() => {
-                        fs.resume();
-                        });
+
+    async couchbaseOptimizedInsert(file, batchSize = 1000) {
+        const { optimizedCollection } = await getCouchbase(); 
+        let count = 0;
+
+        return new Promise((resolve, reject) => {
+            const stream = fs.createReadStream("/data/dataTwentyFive.csv").pipe(csv());
+
+            stream.on('data', async (row) => {
+                const optimized = {
+                    id: `${count}`,
+                    Severity: row.Severity,
+                    State: row.State,
+                    Precipitation: row.Precipitation,
+                    Windy: row.Windy,
+                    Start_Lng: row.Start_Lng,
+                    Start_Lat: row.Start_Lat,
+                    Start_time: row.Start_time,
+                    End_time: row.End_time
+                };
+
+                batchOptimized.push({ key: optimized.id, value: optimized });
+                count++;
+
+                if (batchOptimized.length >= batchSize) {
+                    const batchCopy = [...batchOptimized];
+                    batchOptimized = [];
+
+                    stream.pause();
+
+                    try {
+                        await Promise.all(
+                            batchCopy.map(doc =>
+                                optimizedCollection.upsert(doc.key, doc.value, {
+                                    timeout: 30000
+                                })
+                            )
+                        );
+
+                        stream.resume();
+                    } catch (e) {
+                        stream.destroy();
+                        reject(e);
                     }
-                })
-                .on('end', async () => {
-                    if(batchOptimized.length > 0 ){
-                        await Promise.all([
-                        Promise.all(batchOptimized.map(doc => optimizedCollection.upsert(doc.key, doc.value)))
-                    ]);
                 }
             });
+
+            stream.on("end", async () => {
+                try {
+                    if (batchOptimized.length > 0) {
+                        await Promise.all(
+                            batchOptimized.map(doc =>
+                                optimizedCollection.upsert(doc.key, doc.value)
+                            )
+                        );
+                    }
+                    resolve();
+                } catch (e) {
+                    reject(e);
+                }
+            });
+
+            stream.on("error", reject);
+        });
+    }
+    async waitForCouchbase(cluster) {
+    let tries = 20;
+
+    while (tries > 0) {
+        try {
+            await cluster.query("SELECT 1;");
+            console.log("Couchbase Query service is ready");
+            return;
+        } catch (e) {
+            console.log("Waiting for Couchbase Query service...");
+            tries--;
+            await new Promise(res => setTimeout(res, 2000));
         }
+    }
+    }
+          
 }
+
+             
+    
+
 
 export default couchbaseModel
