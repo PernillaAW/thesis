@@ -35,12 +35,12 @@ routes.post("/read_partial", async (req, res) => {
 })
 
 routes.post("/read_one", async (req, res) => {
-    const result = await mongoDB.readOne(req.body.collection);
+    const result = await couchDB.readOne(req.body.collection);
     res.status(200).json(result);
 })
 
 routes.post("/delete", async (req, res) => {
-    const result = await mongoDB.delete(req.body.collection);
+    const result = await couchDB.delete(req.body.collection);
     res.status(200).json(result);
 })
 

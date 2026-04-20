@@ -30,8 +30,9 @@ class couchbaseModel{
     * @returns 
     */
     async readOne(collection) {
+        const { cluster } = await getCouchbase();
         const sql = `SELECT * FROM \`${collection}\` USE KEY "5000"`;
-        const result = await connectCouchbase.query(sql)
+        const result = await cluster.query(sql)
         return;
     }
 
@@ -43,9 +44,10 @@ class couchbaseModel{
     * @returns 
     */
     async readPartial(collection, columnOne, columnTwo, valueOne, valueTwo) {
+        const { cluster } = await getCouchbase();
         const sql = `SELECT * FROM \`${collection}\` WHERE \`${columnOne}\` = $columnOne AND \`${columnTwo}\` = $columnTwo`;
         const options = { parameters: { [columnOne]: valueOne , [columnTwo]: valueTwo } }
-        const result = await connectCouchbase.query(sql, options)
+        const result = await cluster.query(sql, options)
         return;
     }
     /**
@@ -54,8 +56,9 @@ class couchbaseModel{
     * @returns 
     */
     async drop(collection) {
+        const { cluster } = await getCouchbase();
         const sql = `DROP COLLECTION \`${collection}\``;
-        const result = await connectCouchbase.query(sql)
+        const result = await cluster.query(sql)
         return;
     }
 
@@ -66,11 +69,11 @@ class couchbaseModel{
     * @param {string} filePath - The path to the CSV file to read.
     * @param {number} [batchSize=1000] - The number of documents to insert per batch.
     */
-    async couchbaseUnoptimizedInsert(filePatch, batchSize = 1000) {
+    async couchbaseUnoptimizedInsert(batchSize = 1000) {
         let batchUnoptimized = [];
         let count = 0;
-
-        fs.createReadStream(filePatch)
+        const { unoptimzedCollection } = await getCouchbase(); 
+        fs.createReadStream("/data/dataTwentyFive.csv")
             .pipe(csv())
             .on('data', (row) => {
                 const unoptimized = {
@@ -118,7 +121,7 @@ class couchbaseModel{
 
 
 
-    async couchbaseOptimizedInsert(batchSize = 1000) {
+    async couchbaseOptimizedInsert(batchSize = 50000) {
         let batchOptimized = [];
         console.log("models");
         const { optimizedCollection } = await getCouchbase(); 
@@ -139,8 +142,8 @@ class couchbaseModel{
                     Windy: row.Windy,
                     Start_Lng: row.Start_Lng,
                     Start_Lat: row.Start_Lat,
-                    Start_time: row.Start_time,
-                    End_time: row.End_time
+                    Date: row.Date,
+                    Time: row.Time
                 };
 
                 batchOptimized.push({ key: optimized.id, value: optimized });
