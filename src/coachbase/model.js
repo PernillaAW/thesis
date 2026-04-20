@@ -118,14 +118,19 @@ class couchbaseModel{
 
 
 
-    async couchbaseOptimizedInsert(file, batchSize = 1000) {
+    async couchbaseOptimizedInsert(batchSize = 1000) {
+        let batchOptimized = [];
+        console.log("models");
         const { optimizedCollection } = await getCouchbase(); 
         let count = 0;
 
         return new Promise((resolve, reject) => {
+            console.log("start of promise")
             const stream = fs.createReadStream("/data/dataTwentyFive.csv").pipe(csv());
 
+
             stream.on('data', async (row) => {
+                
                 const optimized = {
                     id: `${count}`,
                     Severity: row.Severity,
@@ -142,6 +147,7 @@ class couchbaseModel{
                 count++;
 
                 if (batchOptimized.length >= batchSize) {
+                    console.log("stream - batch")
                     const batchCopy = [...batchOptimized];
                     batchOptimized = [];
 
@@ -167,6 +173,7 @@ class couchbaseModel{
             stream.on("end", async () => {
                 try {
                     if (batchOptimized.length > 0) {
+                        console.log("on end")
                         await Promise.all(
                             batchOptimized.map(doc =>
                                 optimizedCollection.upsert(doc.key, doc.value)

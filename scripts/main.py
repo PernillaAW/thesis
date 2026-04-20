@@ -1,11 +1,17 @@
 import subprocess
 import time
+import requests
 
 
 def main():
    #for i in range(9):
-    resultList = []
-    """     resultInsert = subprocess.run (["sudo", 
+    resultList = [];
+    """     url="http://localhost:3000/insert"
+    data={"file": " "}
+    header = {"Content-type": "application/x-www-form-urlencoded"}
+    response = requests.post(url, data=data, headers=header)
+    print("Form Data Response \n", response.text) """
+    resultInsert = subprocess.run (["sudo", 
                               "perf", 
                               "stat", 
                               "-C", 
@@ -20,11 +26,11 @@ def main():
                               "-X", 
                               "POST",
                               "-H", "Content-Type: application/json",
-                              "-d", '{"collection":"unoptimized"}',
+                              "-d", '{"file":"optimized"}',
                               "http://localhost:3000/insert"],
                               capture_output=True,
                               text=True)
-    resultList.append(resultInsert) """
+    resultList.append(resultInsert)
     
     print(1)
     
@@ -117,10 +123,11 @@ def main():
                               capture_output=True,
                               text=True)
     resultList.append(resultDelete)
-    """
+    
     print(5)
     for i in resultList:
         print(i)
+    """
 
 if __name__ == "__main__":
     main();

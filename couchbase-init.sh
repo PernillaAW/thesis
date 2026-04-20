@@ -13,7 +13,8 @@ couchbase-cli cluster-init \
     --cluster-username $COUCHBASE_ADMINISTRATOR_USERNAME \
     --cluster-password $COUCHBASE_ADMINISTRATOR_PASSWORD \
     --services data,index,query \
-    --cluster-ramsize 1024 || true
+    --cluster-ramsize 4096 || true \
+    --cluster-index-ramsize 1024 || true
 
 couchbase-cli bucket-create \
     -c couchbase \

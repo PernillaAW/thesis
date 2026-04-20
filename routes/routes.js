@@ -1,5 +1,5 @@
 import express from 'express';
-import couchbaseModel from '../src/coachbase/model.js';
+import getCouchbase from '../src/coachbase/model.js';
 import cassandraModel from '../src/cassandra/model.js';
 import mongodbModel from '../src/mongoDB/model.js';
 import oracleModel from '../src/oracle/model.js';
@@ -13,11 +13,12 @@ const postgis = new postgisModel();
 const oracle = new oracleModel();
 const mongoDB = new mongodbModel();
 const cassandra = new cassandraModel();
-const couchDB = new couchbaseModel();
+const couchDB = new getCouchbase();
 
 routes.post("/insert", async (req, res)=>{
+    console.log("routes")
     //const result = await mongoDB.insert(req.body.collection);
-    const result = await couchDB.couchbaseOptimizedInsert(req.body.file);
+    const result = await couchDB.couchbaseOptimizedInsert();
     //const result = await couchDB.couchbaseUnoptimizedInsert(req.body.file);
     res.status(200).json(result);
 })

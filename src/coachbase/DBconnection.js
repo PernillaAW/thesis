@@ -9,8 +9,8 @@ dotenv.config();
  */
 let cached = null;
 
+
 export async function getCouchbase() {
-    if (cached) return cached;
 
     const cluster = await connect("couchbase://couchbase", {
         username: process.env.COUCHBASE_ADMINISTRATOR_USERNAME,

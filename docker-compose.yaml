@@ -113,13 +113,17 @@
       volumes:
         - .:/data
         - couchbasedata:/opt/couchbase/var
+      ulimits:
+        nofile:
+          soft: 65536
+          hard: 65536
       healthcheck:
         test: ["CMD", "curl", "-f", "http://localhost:8091/pools"]
         interval: 10s
         timeout: 5s
         retries: 15
         start_period: 60s
-    
+        
     couchbase-init:
       profiles: ["couchbase"]
       image: couchbase:enterprise-8.0.0
