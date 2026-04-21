@@ -5,37 +5,37 @@ USE thesis;
 CREATE TABLE thesis.unoptimized(
     id BIGINT,
     Severity INT,
-    State VARCHAR(2),
+    State TEXT,
     Precipitation FLOAT, 
     Windy SMALLINT, 
     Start_Lng DOUBLE, 
     Start_Lat DOUBLE, 
     Date TEXT, 
-    Time DATE,
+    Time TIMESTAMP,
 );
 
 CREATE TABLE thesis.optimizedbyid(
     id BIGINT,
     Severity INT,
-    State VARCHAR(2),
+    State TEXT,
     Precipitation FLOAT, 
     Windy SMALLINT, 
     Start_Lng DOUBLE, 
     Start_Lat DOUBLE, 
     Date TEXT, 
-    Time DATE,
+    Time TIMESTAMP,
     PRIMARY KEY(id)
 );
 
 CREATE TABLE thesis.optimizedbytime(
     id BIGINT,
     Severity INT,
-    State VARCHAR(2),
+    State TEXT,
     Precipitation FLOAT, 
     Windy SMALLINT, 
     Start_Lng DOUBLE, 
     Start_Lat DOUBLE, 
     Date TEXT, 
-    Time DATE,
+    Time TIMESTAMP,
     PRIMARY KEY((Date), Time)
-)
+);
