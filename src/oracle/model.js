@@ -2,7 +2,6 @@ import { dbConnectionOracle } from "./DBConnection.js"
 import fs from "fs";
 import csv from "csv-parser";
 
-
 class oracleModel{
     /**
     * Read full table from database
@@ -12,6 +11,7 @@ class oracleModel{
         const dbconn = await dbConnectionOracle();
         const sql = `SELECT * FROM ${table}`;
         const result = await dbconn.execute(sql);
+        console.log("ALL", result.rows.length)
         return true;
     };
     /**
@@ -24,9 +24,10 @@ class oracleModel{
     */
     async readPartial(table, columnOne, columnTwo, valueOne, valueTwo) {
         const dbconn = await dbConnectionOracle();
-        const sql = `SELECT * FROM ${table} WHERE ${columnOne} = $1 AND ${columnTwo} = $2`;
+        const sql = `SELECT * FROM ${table} WHERE ${columnOne} = :1 AND ${columnTwo} = :2`;
         const arg = [valueOne, valueTwo];
         const result = await dbconn.execute(sql, arg);
+        console.log("PART", result.rows.length)
         return true;
     };
 
@@ -36,8 +37,9 @@ class oracleModel{
     */
     async readOne(table) {
         const dbconn = await dbConnectionOracle();
-        const sql = `SELECT * FROM ${table} WHERE id = 5000`
+        const sql = `SELECT * FROM ${table} WHERE id = 1`
         const result = await dbconn.execute(sql)
+        console.log("ONE", result.rows.length)
         return true;
     }
     /**
@@ -47,15 +49,17 @@ class oracleModel{
     async delete(table) {
         const dbconn = await dbConnectionOracle();
         const sql = `TRUNCATE TABLE ${table}`
-        const result = await dbconn.execute(sql)
+        const result = await dbconn.execute(sql);
+        const reset = `ALTER TABLE ${table} MODIFY(ID GENERATED AS IDENTITY (START WITH 1))`;
+        await dbconn.execute(reset);
         return true;
     
     }
-    async insert(path, table) {
+    async insert(table) {
         const dbconn = await dbConnectionOracle();
-        const sql = `INSERT INTO ${table} (Severity, State, Precipitation, Windy, Start_Lng, Start_Lat, Start_time, End_time) VALUES (:Severity, :State, :Precipitation, :Windy, :Start_Lng, :Start_Lat, :Start_time, :End_time);`
+        const sql = `INSERT INTO ${table} (Severity, State, Precipitation, Windy, Start_Lng, Start_Lat, "Time", "Date") VALUES (:Severity, :State, :Precipitation, :Windy, :Start_Lng, :Start_Lat, :TimeVal, :DateVal)`
         let bulk = [];
-        const size = 1000000;
+        const size = 10000;
         
         return new Promise((resolve, reject)=>{
             fs.createReadStream("/data/dataTwentyFive.csv")
@@ -68,10 +72,10 @@ class oracleModel{
                     Windy:row.Windy,
                     Start_Lng:row.Start_Lng,
                     Start_Lat:row.Start_Lat,
-                    Start_time:row.Start_time,
-                    End_time:row.End_time
+                    TimeVal: new Date(row.Time),
+                    DateVal: new Date(row.Date)
                 });
-                if (bulk>= size){
+                if (bulk.length>= size){
                     const copyBulk = [...bulk];
                     bulk=[];
                     try{
@@ -84,6 +88,8 @@ class oracleModel{
             .on("end", async()=>{
                 try{
                     if (bulk.length > 0){
+                        const copyBulk = [...bulk];
+                        bulk=[];
                         await dbconn.executeMany(sql, copyBulk, {autoCommit:true})
                     }
                     resolve(true);

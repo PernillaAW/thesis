@@ -116,7 +116,7 @@ def main():
     resultList.append(resultDelete.stderr)
     
     print(5)
-
+    
     for i in resultList:
         print(i)
     

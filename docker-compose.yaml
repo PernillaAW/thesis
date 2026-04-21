@@ -45,14 +45,14 @@
       image: gvenzl/oracle-xe:21-slim
       environment:
         ORACLE_PASSWORD: password
-        APP_USER: appuser
-        APP_USER_PASSWORD: password
+        APP_USER: app
+        APP_USER_PASSWORD: app
       ports:
         - "1521:1521"
       volumes:
         - .:/data
         - oracledb:/opt/oracle/oradata
-        - ./sql/oracletables:/container-entrypoint-initdb.d
+        - ./sql/oracle:/container-entrypoint-initdb.d
       healthcheck:
         test: ["CMD", "healthcheck.sh"]
         interval: 10s
