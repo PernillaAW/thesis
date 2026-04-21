@@ -8,7 +8,8 @@ class postgreModel{
 async readAll(table) {
     const client = await connectPostgre();
     const sql = `SELECT * FROM ${table}`
-    const result = await client.query(sql)
+    await client.query(sql);
+    console.log("READ ALL")
     return true;
 };
 
@@ -25,6 +26,7 @@ async readPartial(table, columnOne, columnTwo, valueOne, valueTwo) {
     const sql = `SELECT * FROM ${table} WHERE ${columnOne} = $1 AND ${columnTwo} = $2`
     const arg = [valueOne, valueTwo]
     const result = await client.query(sql, arg)
+    console.log("readPart", result.rowCount)
     return true;
 };
 
@@ -36,6 +38,7 @@ async readOne(table) {
     const client = await connectPostgre();
     const sql = `SELECT * FROM ${table} WHERE id = 5000`
     const result = await client.query(sql)
+    console.log("readOne", result.rowCount)
     return true;
 };
 
@@ -47,6 +50,7 @@ async delete(table) {
     const client = await connectPostgre();
     const sql = `TRUNCATE TABLE ${table} RESTART IDENTITY`
     const result = await client.query(sql);
+    console.log("delete", result.rowCount)
     return true;
 }; 
 
@@ -58,12 +62,12 @@ async delete(table) {
  */
 async insert(table) {
     const client = await connectPostgre();
-    const copySQl = `COPY ${table} (severity, state, precipitation, windy, Start_Lng, Start_Lat, start_time, end_time) 
-    FROM '/data/dataTwentyFive.csv' 
-    WITH (FORMAT csv, HEADER true)`;
-    await client.query(copySQl);
+    const copySQl = `COPY ${table} (Severity,State,Precipitation,Windy,Start_Lat,Start_Lng,Date,Time) 
+    FROM '/data/dataTwentyFive.csv'
+    WITH (FORMAT csv, HEADER true, DELIMITER ',' );`;
+    const result = await client.query(copySQl);
+    console.log("insert", result.rowCount)
     return true
-
 }
 }
 export default postgreModel

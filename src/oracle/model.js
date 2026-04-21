@@ -14,7 +14,6 @@ class oracleModel{
         const result = await dbconn.execute(sql);
         return true;
     };
-
     /**
     * Searches table for partial results ~5%
     * @param {table} table 

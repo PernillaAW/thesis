@@ -6,8 +6,8 @@ CREATE TABLE IF NOT EXISTS unoptimized(
     Windy SMALLINT, 
     Start_Lng DOUBLE PRECISION, 
     Start_Lat DOUBLE PRECISION, 
-    start_time DATE, 
-    End_time DATE
+    Time DATE, 
+    Date DATE
 );
 
 CREATE TABLE IF NOT EXISTS optimized(
@@ -18,8 +18,8 @@ CREATE TABLE IF NOT EXISTS optimized(
     Precipitation FLOAT, 
     Start_Lng DOUBLE PRECISION, 
     Start_Lat DOUBLE PRECISION, 
-    Start_time DATE, 
-    End_time DATE
+    Time DATE, 
+    Date DATE
 );
 CREATE INDEX Severity_idx ON optimized(Severity);
 CREATE INDEX Windy_idx ON optimized(Windy);

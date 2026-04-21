@@ -1,5 +1,6 @@
   services:
     start:
+      cpuset: "4"
       container_name: start
       build:
         context: .
@@ -13,7 +14,13 @@
         - ./:/app
         - /app/node_modules
         - /var/run/dbus:/var/run/dbus
+
+    #NEED TO ADD dependo ON in start
+      #depends on:
+        #postgres:
+          #status: healthy
     postgres:
+      cpuset: "0-3"
       profiles: ["postgres"]
       container_name: postgres
       image: postgres:16
@@ -32,6 +39,7 @@
         retries: 5
 
     oracle:
+      cpuset: "0-3"
       profiles: ["oracle"]
       container_name: oracle
       image: gvenzl/oracle-xe:21-slim
@@ -139,7 +147,7 @@
 
   volumes:
     pgdata: {}
-    oracledata: {}
+    oracledb: {}
     postgisdata: {}
     mongodbdata: {}
     cassandradata: {}

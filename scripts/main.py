@@ -4,19 +4,14 @@ import requests
 
 
 def main():
-   #for i in range(9):
     resultList = [];
-    """     url="http://localhost:3000/insert"
-    data={"file": " "}
-    header = {"Content-type": "application/x-www-form-urlencoded"}
-    response = requests.post(url, data=data, headers=header)
-    print("Form Data Response \n", response.text) """
-    resultInsert = subprocess.run (["sudo", 
+   #for i in range(9):
+    
+    resultInsert = subprocess.run(
+                            ["sudo", 
                               "perf", 
-                              "stat", 
-                              "-C", 
-                              "1",
-                              "-a",
+                              "stat",
+                              "-C", "0-3",
                               "-e",
                               "power/energy-pkg/",
                               "curl",
@@ -26,21 +21,20 @@ def main():
                               "-X", 
                               "POST",
                               "-H", "Content-Type: application/json",
-                              "-d", '{"file":"optimized"}',
+                              "-d", '{"collection":"optimized"}',
                               "http://localhost:3000/insert"],
                               capture_output=True,
                               text=True)
-    resultList.append(resultInsert)
-    
+
+    resultList.append(resultInsert.stderr)
+
     print(1)
     
     #time.sleep(300)
     resultReadAll = subprocess.run (["sudo", 
                               "perf", 
                               "stat", 
-                              "-C", 
-                              "1",
-                              "-a",
+                              "-C", "0-3",
                               "-e",
                               "power/energy-pkg/",
                               "curl",
@@ -54,16 +48,15 @@ def main():
                               "http://localhost:3000/read_all"],
                               capture_output=True,
                               text=True)
-    resultList.append(resultReadAll)
+    resultList.append(resultReadAll.stderr)
     print(2)
-    """
+    
     #time.sleep(300)
     resultReadPartial = subprocess.run (["sudo", 
                               "perf", 
                               "stat", 
                               "-C", 
-                              "1",
-                              "-a",
+                              "0-3",
                               "-e",
                               "power/energy-pkg/",
                               "curl",
@@ -73,19 +66,18 @@ def main():
                               "-X", 
                               "POST",
                               "-H", "Content-Type: application/json",
-                              "-d", '{"collection":"unoptimized", "columnOne": "Severity", "columnTwo": "State", "valueOne":"2", "valueTwo":"SC"}',
+                              "-d", '{"collection":"optimized", "columnOne": "Severity", "columnTwo": "State", "valueOne":"2", "valueTwo":"SC"}',
                               "http://localhost:3000/read_partial"],
                               capture_output=True,
                               text=True)
-    resultList.append(resultReadPartial)
+    resultList.append(resultReadPartial.stderr)
     print(3)
     #time.sleep(300)
     resultReadOne = subprocess.run (["sudo", 
                               "perf", 
                               "stat", 
                               "-C", 
-                              "1",
-                              "-a",
+                              "0-3",
                               "-e",
                               "power/energy-pkg/",
                               "curl",
@@ -95,11 +87,11 @@ def main():
                               "-X", 
                               "POST",
                               "-H", "Content-Type: application/json",
-                              "-d", '{"collection":"unoptimized"}',
+                              "-d", '{"collection":"optimized"}',
                               "http://localhost:3000/read_one"],
                               capture_output=True,
                               text=True)
-    resultList.append(resultReadOne)
+    resultList.append(resultReadOne.stderr)
     print(4)
     #time.sleep(300)
     
@@ -107,8 +99,7 @@ def main():
                               "perf", 
                               "stat", 
                               "-C", 
-                              "1",
-                              "-a",
+                              "0-3",
                               "-e",
                               "power/energy-pkg/",
                               "curl",
@@ -118,16 +109,17 @@ def main():
                               "-X", 
                               "POST",
                               "-H", "Content-Type: application/json",
-                              "-d", '{"collection":"unoptimized"}',
+                              "-d", '{"collection":"optimized"}',
                               "http://localhost:3000/delete"],
                               capture_output=True,
                               text=True)
-    resultList.append(resultDelete)
+    resultList.append(resultDelete.stderr)
     
     print(5)
+
     for i in resultList:
         print(i)
-    """
+    
 
 if __name__ == "__main__":
     main();

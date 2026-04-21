@@ -8,6 +8,7 @@ dotenv.config();
 /**
  * Connection to the postgre database
  */
+
 export async function connectPostgre() {
     try{
         const client = new Client({
