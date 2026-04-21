@@ -21,7 +21,7 @@ def main():
                               "-X", 
                               "POST",
                               "-H", "Content-Type: application/json",
-                              "-d", '{"collection":"optimized"}',
+                              "-d", '{"collection":"unoptimized"}',
                               "http://localhost:3000/insert"],
                               capture_output=True,
                               text=True)
@@ -44,7 +44,7 @@ def main():
                               "-X", 
                               "POST",
                               "-H", "Content-Type: application/json",
-                              "-d", '{"collection":"optimized"}',
+                              "-d", '{"collection":"unoptimized"}',
                               "http://localhost:3000/read_all"],
                               capture_output=True,
                               text=True)
@@ -66,7 +66,7 @@ def main():
                               "-X", 
                               "POST",
                               "-H", "Content-Type: application/json",
-                              "-d", '{"collection":"optimized", "columnOne": "Severity", "columnTwo": "State", "valueOne":"2", "valueTwo":"SC"}',
+                              "-d", '{"collection":"unoptimized", "columnOne": "Severity", "columnTwo": "State", "valueOne":"2", "valueTwo":"SC"}',
                               "http://localhost:3000/read_partial"],
                               capture_output=True,
                               text=True)
@@ -87,7 +87,7 @@ def main():
                               "-X", 
                               "POST",
                               "-H", "Content-Type: application/json",
-                              "-d", '{"collection":"optimized"}',
+                              "-d", '{"collection":"unoptimized"}',
                               "http://localhost:3000/read_one"],
                               capture_output=True,
                               text=True)
@@ -109,7 +109,7 @@ def main():
                               "-X", 
                               "POST",
                               "-H", "Content-Type: application/json",
-                              "-d", '{"collection":"optimized"}',
+                              "-d", '{"collection":"unoptimized"}',
                               "http://localhost:3000/delete"],
                               capture_output=True,
                               text=True)

@@ -11,6 +11,7 @@ class postgisModel{
         const { client, postgis } = await postgisconnect();
         const sql = `SELECT * FROM ${table}`
         const result = await client.query(sql)
+        console.log("ALL", result.rowCount)
         return true;
     };
 
@@ -28,6 +29,7 @@ class postgisModel{
         const sql = `SELECT * FROM ${table} WHERE point = $1`
         const arg = [valueOne]
         const result = await client.query(sql, arg)
+        console.log("PART", result.rowCount)
         return true;
     };
 
@@ -37,6 +39,7 @@ class postgisModel{
         const sql = `SELECT * FROM ${table} WHERE ${columnOne} = $1 AND ${columnTwo}= $2`
         const arg = [valueOne, valueTwo]
         const result = await client.query(sql, arg)
+        console.log("PART", result.rowCount)
         return true;
     };
 
@@ -48,6 +51,7 @@ class postgisModel{
         const { client, postgis } = await postgisconnect();
         const sql = `SELECT * FROM ${table} WHERE id = 5000`
         const result = await client.query(sql)
+        console.log("ONE", result.rowCount)
         return true;
     };
 
@@ -56,9 +60,11 @@ class postgisModel{
     * @param {table} table 
     */
     async delete(table) {
+        console.log(table);
         const { client, postgis } = await postgisconnect();
-        const sql = `TRANCATE TABLE ${table} RESTART IDENTITY`
+        const sql = `TRUNCATE TABLE ${table} RESTART IDENTITY`
         const result = await client.query(sql)
+        console.log("DELETE", result)
         return true;
     };
 
@@ -67,15 +73,15 @@ class postgisModel{
     * @param {path} path to file
     * @param {table} table 
     */
-    async insert(path, table) {
+    async insert(table) {
         const { client, postgis } = await postgisconnect();
         const copySQl = `COPY ${table}(Severity, State, Precipitation, Windy, Geo_text, Start_time, End_time) 
-        FROM '/postgis/postgis.cvs 
+        FROM '/data/postgis.csv'
         DELIMITER ',' 
         CSV HEADER`;
         await client.query(copySQl)
-        await client.query(`UPDATE ${table} SET Geo = ST_GeomFromText(Geo_text, 4326)`);
-        await client.query(`ALTER TABLE ${table} DEROP COLUMN Geo_text`)
+        //await client.query(`UPDATE ${table} SET Geo = ST_GeomFromText(Geo_text, 4326)`);
+        //await client.query(`ALTER TABLE ${table} DROP COLUMN Geo_text`)
     } 
 }
 

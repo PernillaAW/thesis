@@ -1,6 +1,6 @@
 import express from 'express';
 //import { couchbaseSetup } from './coachbase/setUp.js';
-//import { preprocessing } from './postgis/preprocess.js';
+import { preprocessing } from './postgis/preprocess.js';
 
 import routes from '../routes/routes.js';
 
@@ -26,4 +26,4 @@ app.listen(3000, () => console.log(`Server running on 3000`));
 //start();
 
 
-//preprocessing("data.csv")
+preprocessing("dataTwentyFive.csv")

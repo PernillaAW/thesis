@@ -14,11 +14,14 @@
         - ./:/app
         - /app/node_modules
         - /var/run/dbus:/var/run/dbus
+      depends_on:
+        postgis:
+          condition: service_healthy
 
     #NEED TO ADD dependo ON in start
-      #depends on:
+      #depends_on:
         #postgres:
-          #status: healthy
+          #condition: service_healthy
     postgres:
       cpuset: "0-3"
       profiles: ["postgres"]
@@ -60,6 +63,7 @@
         retries: 10
 
     postgis:
+      cpuset: "0-3"
       profiles: ["postgis"]
       container_name: postgis
       image: postgis/postgis:13-3.5
@@ -67,9 +71,9 @@
       ports:
         - "5433:5432"
       volumes:
+        - .:/data
         - postgisdata:/var/lib/postgresql/data
         - ./sql/postGIStables.sql:/docker-entrypoint-initdb.d/init_db.sql
-        - .:/postgis
       healthcheck:
         test: ["CMD-SHELL", "pg_isready -U postgres"]
         interval: 5s
