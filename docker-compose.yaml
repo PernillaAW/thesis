@@ -14,9 +14,6 @@
         - ./:/app
         - /app/node_modules
         - /var/run/dbus:/var/run/dbus
-      depends_on:
-        postgis:
-          condition: service_healthy
 
     #NEED TO ADD dependo ON in start
       #depends_on:
