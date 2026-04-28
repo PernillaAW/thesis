@@ -4,45 +4,44 @@ import requests
 import csv
 """
 BASIC:
-"-d", '{"collection":"optimizedbytime", "columnOne": "Severity", "columnTwo": "State", "valueOne":"2", "valueTwo":"SC"}'
+"-d", '{"collection":"unoptimized", "columnOne": "Severity", "columnTwo": "State", "valueOne":"2", "valueTwo":"SC"}',
 
 FOR OPTIMIZED CASSANDRA:
-"-d", '{"collection":"optimized", "columnOne": "Date", "valueOne":"2016", "valueTwo":"20:30:00", "valueThree":"21:45:00"}',
+Workload A 
+"-d", '{"collection":"optimizedbytime", "columnOne": "Date", "valueOne":17:53:00, "valueTwo": 18:30:00}',
+Workload B and C:
+"-d", '{"collection":"optimizedbytime", "columnOne": "Date", "valueOne":17:52:00, "valueTwo": 18:29:00}',
 
+FOR OPTIMIZED GIS:
+Workload A
+"-d", '{"collection":"optimized", "valueOne":24.54, "valueTwo":-81.9, "valueThree":27.7, "valueFour":-78.7}',
+Workload B
+"-d", '{"collection":"optimized", "valueOne":28.34, "valueTwo":-99.68, "valueThree":32.3, "valueFour":-95.72}',
+Workload C
+"-d", '{"collection":"optimized", "valueOne":33.8, "valueTwo":-118.46, "valueThree":34.32, "valueFour":-117.94}',
+
+
+FOR OPTIMIZED ORACLE:
+Workload A, B, C:
+"-d", '{"collection":"optimized", "columnOne": "Windy", "columnTwo": "Precipitation", "valueOne":0, "valueTwo":1.638706}',
+
+FOR OPTIMIZED MONGODB & POSTGREE:
+Workload A, B, C:
+"-d", '{"collection":"optimized", "columnOne": "Windy", "columnTwo": "Severity", "valueOne":0, "valueTwo":4}',
 
 """
 
 def main():
-    resultList = [];
-    fieldnames = [
-    "id",
-    "IDLE Joules", "IDLE Time",
-    "Insert joules", "Insert time",
-    "Read All joules", "Read All time",
-    "Read Partial joules", "Read Partial time",
-    "Read One joules", "Read One Time",
-    "Delete Joules", "Delete Time"]
+    results = []
     count = 0;
-    for i in range(10):
-        sleeptime = subprocess.run(["sudo", 
-                                "perf", 
-                                "stat",
-                                "-C", "0-3",
-                                "-e",
-                                "power/energy-pkg/",
-                                "taskset", "-c", "0-3",
-                                "sleep", "5"],
-                                capture_output=True,
-                                text=True)
-        resultList.append(sleeptime.stderr)
-
-        resultInsert = subprocess.run(
+    for i in range(2):  
+        print("RUN ", count)
+        insert = subprocess.run(
                                 ["sudo", 
                                 "perf", 
                                 "stat",
                                 "-C", "0-3",
-                                "-e",
-                                "power/energy-pkg/",
+                                "-e", "power_core/energy-core/",
                                 "curl",
                                 "-s",
                                 "-o",
@@ -50,22 +49,23 @@ def main():
                                 "-X", 
                                 "POST",
                                 "-H", "Content-Type: application/json",
-                                "-d", '{"collection":"optimizedbytime"}',
+                                "-d", '{"collectionTime":"optimizedbytime", "collectionId":"optimizedbyid", "path": "dataC"}',
                                 "http://localhost:3000/insert"],
                                 capture_output=True,
                                 text=True)
-
-        resultList.append(resultInsert.stderr)
-
-        print(1)
-        
-        #time.sleep(100)
-        resultReadAll = subprocess.run (["sudo", 
+        print("Insert done")
+        print(insert.stderr)
+        energy, times = retreive_values(insert.stderr)
+        results.append({"Run": count,
+                        "Operation": "insert",
+                        "Energy": energy,
+                        "Time": times})
+        time.sleep(60)
+        read_all = subprocess.run (["sudo", 
                                 "perf", 
                                 "stat", 
                                 "-C", "0-3",
-                                "-e",
-                                "power/energy-pkg/",
+                                "-e", "power_core/energy-core/",
                                 "curl",
                                 "-s",
                                 "-o",
@@ -77,17 +77,22 @@ def main():
                                 "http://localhost:3000/read_all"],
                                 capture_output=True,
                                 text=True)
-        resultList.append(resultReadAll.stderr)
-        print(2)
-        
-        #time.sleep(100)
-        resultReadPartial = subprocess.run (["sudo", 
+
+        print("Read all done")   
+        print(read_all.stderr)
+        energy, times = retreive_values(read_all.stderr)
+        results.append({"Run": count,
+                        "Operation": "read_all",
+                        "Energy": energy,
+                        "Time": times})   
+        time.sleep(60)
+
+        partial = subprocess.run (["sudo", 
                                 "perf", 
                                 "stat", 
                                 "-C", 
                                 "0-3",
-                                "-e",
-                                "power/energy-pkg/",
+                                "-e", "power_core/energy-core/",
                                 "curl",
                                 "-s",
                                 "-o",
@@ -95,21 +100,21 @@ def main():
                                 "-X", 
                                 "POST",
                                 "-H", "Content-Type: application/json",
-                                "-d", '{"table":"optimizedbytime", "startTime": "20:30:00", "endTime":"21:45:00"}',
+                                "-d", '{"collection":"optimizedbytime", "valueOne": "17:52:00", "valueTwo": "18:29:00"}',
                                 "http://localhost:3000/read_partial"],
                                 capture_output=True,
                                 text=True)
-        resultList.append(resultReadPartial.stderr)
-        print(3)
-        #time.sleep(100)
-        
-        resultReadOne = subprocess.run (["sudo", 
+        print("Partial done")
+        print(partial.stderr)
+        energy, times = retreive_values(partial.stderr)
+        results.append({"Run": count, "Operation": "partial", "Energy": energy, "Time": times})   
+        time.sleep(60)
+        read_one = subprocess.run (["sudo", 
                                 "perf", 
                                 "stat", 
                                 "-C", 
                                 "0-3",
-                                "-e",
-                                "power/energy-pkg/",
+                                "-e", "power_core/energy-core/",
                                 "curl",
                                 "-s",
                                 "-o",
@@ -117,22 +122,26 @@ def main():
                                 "-X", 
                                 "POST",
                                 "-H", "Content-Type: application/json",
-                                "-d", '{"collection":"optimizedbytime"}',
+                                "-d", '{"collection":"optimizedbyid"}',
                                 "http://localhost:3000/read_one"],
                                 capture_output=True,
                                 text=True)
-        resultList.append(resultReadOne.stderr)
+    
+        print("read_one done")
+        print(read_one.stderr)
+        energy, times = retreive_values(read_one.stderr)
+        results.append({"Run": count,
+                        "Operation": "read_one",
+                        "Energy": energy,
+                        "Time": times})   
+        time.sleep(60)
         
-        print(4)
-        #time.sleep(100)
-        
-        resultDelete = subprocess.run (["sudo", 
+        delete = subprocess.run (["sudo", 
                                 "perf", 
                                 "stat", 
                                 "-C", 
                                 "0-3",
-                                "-e",
-                                "power/energy-pkg/",
+                                "-e", "power_core/energy-core/",
                                 "curl",
                                 "-s",
                                 "-o",
@@ -144,67 +153,121 @@ def main():
                                 "http://localhost:3000/delete"],
                                 capture_output=True,
                                 text=True)
-        resultList.append(resultDelete.stderr)
-        
-        print(5)   
-
+        print("Delete done") 
+        print(delete.stderr)
+        energy, times = retreive_values(delete.stderr)
+        results.append({"Run": count,
+                        "Operation": "delete",
+                        "Energy": energy,
+                        "Time": times}) 
         count += 1
-        row = {"id": count}
-        labels = [
-            ("IDLE Joules", "IDLE Time"),
-            ("Insert joules", "Insert time"),
-            ("Read All joules", "Read All time"),
-            ("Read Partial joules", "Read Partial time"),
-            ("Read One joules", "Read One Time"),
-            ("Delete Joules", "Delete Time")
-        ]
+    summary = calc_min_max_average(results)
+    write_csv_wide(results, summary)
+        
+        
 
-        for idx, result in enumerate(resultList):
-            lines = [line.strip() for line in result.split('\n') if line.strip()]
-            energy = None
-            executeTime = None
+def retreive_values(perf_reading):
+    lines = [line.strip() for line in perf_reading.split('\n') if line.strip()]
+    energy = None
+    executeTime = None
 
-            for line in lines:
-                if "Joules" in line:
-                    value = line.split()[0]
-                    value = value.replace('\u202f', '').replace(',','.')
-                    energy = float(value)
-                elif "seconds" in line:
-                    value = line.split()[0]
-                    value = value.replace(',','.')
-                    executeTime = float(value)
+    for line in lines:
+        
+        if "Joules" in line:
+            value = line.split()[0]
+            value = value.replace('\u202f', '').replace(',', '.')
+            energy = float(value)
 
-            row[labels[idx][0]] = energy
-            row[labels[idx][1]] = executeTime
-        with open("cassandrafull.csv", "a", newline="") as f:
-            writer = csv.DictWriter(f, fieldnames=row.keys())
-            if f.tell() == 0:
-                writer.writeheader()
-            writer.writerow(row)
-        resultList = []
+        if "seconds time elapsed" in line or "seconds" in line:
+            parts = line.split()
+            for p in parts:
+                try:
+                    executeTime = float(p.replace(',', '.'))
+                    break
+                except:
+                    continue
+
+    return energy, executeTime
 
 
-        #time.sleep(100)
-    with open("cassandrafull.csv", "a", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=fieldnames)
+def calc_min_max_average(result):
+    stat_vals = {}
 
-        avg_row = {
-            "id": "AVG",
-            "IDLE Joules": "=AVERAGE(B2:B11)",
-            "IDLE Time": "=AVERAGE(C2:C11)",
-            "Insert joules": "=AVERAGE(D2:D11)",
-            "Insert time": "=AVERAGE(E2:E11)",
-            "Read All joules": "=AVERAGE(F2:F11)",
-            "Read All time": "=AVERAGE(G2:G11)",
-            "Read Partial joules": "=AVERAGE(H2:H11)",
-            "Read Partial time": "=AVERAGE(I2:I11)",
-            "Read One joules": "=AVERAGE(J2:J11)",
-            "Read One Time": "=AVERAGE(K2:K11)",
-            "Delete Joules": "=AVERAGE(L2:L11)",
-            "Delete Time": "=AVERAGE(M2:M11)"
+    for r in(result):
+        operation = r["Operation"]
+        stat_vals.setdefault(operation, []).append(r["Energy"])
+
+    summery = []
+
+    for operation, vals in stat_vals.items():
+        summery.append({
+            "Operation": operation,
+            "Min": min(vals),
+            "Max": max(vals),
+            "Avg": sum(vals) / len(vals)
+        })
+    return summery
+
+def pivot_results(result):
+    pivot = {}
+    runs = set()
+
+    for r in result:
+        op = r["Operation"]
+        run = r["Run"]
+
+        runs.add(run)
+
+        pivot.setdefault(op, {})[run] = {
+            "Energy": r["Energy"],
+            "Time": r["Time"]
         }
 
-        writer.writerow(avg_row)
+    runs = sorted(runs)
+
+    return pivot, runs
+
+
+
+def write_csv_wide(result, summery):
+    pivot, runs = pivot_results(result)
+
+    with open("test.csv", "w", newline="") as f:
+
+        fieldnames = (
+            ["Operation"] +
+            [f"Run {r} Joules" for r in runs] +
+            [f"Run {r} Time" for r in runs]
+        )
+
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+
+        operation_order = ["insert", "read_all", "partial", "read_one", "delete"]
+
+        for op in operation_order:
+            if op in pivot:
+                row = {"Operation": op}
+
+                for r in runs:
+                    row[f"Run {r} Joules"] = pivot[op].get(r, {}).get("Energy", "")
+
+                for r in runs:
+                    row[f"Run {r} Time"] = pivot[op].get(r, {}).get("Time", "")
+
+                writer.writerow(row)
+
+        writer.writerow({})
+        writer.writerow({})
+
+        summary_fields = ["Operation", "Min", "Max", "Avg"]
+        writer = csv.DictWriter(f, fieldnames=summary_fields)
+
+        writer.writeheader()
+
+        for s in summery:
+            writer.writerow(s)
+
 
 if __name__ == "__main__":
     main();

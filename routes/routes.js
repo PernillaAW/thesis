@@ -18,16 +18,13 @@ const cassandra = new cassandraModel();
 
 routes.post("/insert", async (req, res)=>{
     try {
-        console.log(req.body.collection)
-        const result = await cassandra.insert(req.body.collection);
+        //const result = await cassandra.insert(req.body.collection, req.body.path);
+        const result = await cassandra.insertOptimized(req.body.collectionTime, req.body.collectionId, req.body.path);
         res.status(200).json({ success: true, result });
     } catch (err) {
         console.error("INSERT ERROR:", err);
         res.status(500).json({ success: false, error: err.message });
         }
-    //const result = await couchDB.couchbaseOptimizedInsert();
-    //const result = await couchDB.couchbaseUnoptimizedInsert(req.body.file);
-    //res.status(200).json(result);
 })
 
 routes.post("/read_all", async (req, res) => {
@@ -37,8 +34,8 @@ routes.post("/read_all", async (req, res) => {
 
 routes.post("/read_partial", async (req, res) => {
     //const result = await cassandra.readPartial (req.body.collection, req.body.columnOne, req.body.columnTwo, req.body.valueOne, req.body.valueTwo);
-    //const result = await postgis.readPartialOP(req.body.collection, req.body.valueOne)
-    const result = await cassandra.readPartialOptimized(req.body.table, req.body.startTime, req.body.endTime)
+    //const result = await postgis.readPartialOP(req.body.collection, req.body.valueOne, req.body.valueTwo, req.body.valueThree, req.body.valueFour)
+    const result = await cassandra.readPartialOptimized(req.body.collection, req.body.valueOne, req.body.valueTwo)
     res.status(200).json(result);
 })
 

@@ -13,7 +13,7 @@ class mongodbModel{
         const db = await mongoDatabase();
         const databaseCollection = db.collection(collection);
         const result = await databaseCollection.find({}).toArray();   
-        console.log("READ ALL", result[10]) 
+        console.log("READ ALL", result.length) 
         return result;
     }
 
@@ -31,7 +31,7 @@ class mongodbModel{
         const databaseCollection = db.collection(collection) 
         const query = { [columnA]: valueA, [columnB]: valueB }
         const result = await databaseCollection.find(query).toArray();
-        console.log("READ PART", result[10])
+        console.log("READ PART", result.length)
         return result;
     }
 
@@ -43,7 +43,7 @@ class mongodbModel{
         const db = await mongoDatabase();
         const databaseCollection = db.collection(collection) 
         const result = await databaseCollection.findOne({id: 5000});
-        console.log("READ PART", result)
+        console.log("READ ONE", result)
         return result;
     }
 
@@ -55,7 +55,7 @@ class mongodbModel{
         const db = await mongoDatabase();
         const databaseCollection = db.collection(collection) 
         const result = await databaseCollection.drop()
-        console.log("DELETE", result)
+        console.log("DELETE", result.length)
         return result;
     
     }
@@ -65,8 +65,8 @@ class mongodbModel{
     * @param {path} path to file
     * @param {table} table 
     */
-    async insert(collection) {
-        const filePath = '/data/dataTwentyFive.csv';
+    async insert(collection, path) {
+        const filePath = `/data/${path}.csv`;
         const db = await mongoDatabase();
         const databaseCollection = db.collection(collection)
         let count = 0;

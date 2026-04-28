@@ -9,29 +9,24 @@ class postgisModel{
     */
     async readAll(table) {
         const { client, postgis } = await postgisconnect();
-        const sql = `SELECT * FROM ${table}`
-        const result = await client.query(sql)
-        console.log("ALL", result.rowCount)
-        return true;
-    };
+        let lastId = 0;
+        let rows;
 
-    /**
-    * Searches table for partial results ~5%
-    * @param {table} table 
-    * @param {columnOne} columnOne for searching
-    * @param {columnTwo} columnTwo for searching
-    * @param {valueOne} valueOne specified for search
-    * @param {valueTwo} valueTwo specified for search
-    */
-    async readPartialOP(table, valueOne) {
-    
-        const { client, postgis } = await postgisconnect();
-        const sql = `SELECT * FROM ${table} WHERE point = $1`
-        const arg = [valueOne]
-        const result = await client.query(sql, arg)
-        console.log("PART", result.rowCount)
+        do {
+            rows = await client.query(
+                `SELECT FROM ${table} WHERE id > $1 ORDER BY id LIMIT 5000`,
+                [lastId]
+            );
+            if (rows.rows.length > 0) {
+                lastId = rows.rows[rows.rows.length - 1].id;
+            }
+
+        } while (rows.rows.length > 0);
+
+        console.log("ALL", lastId)
         return true;
-    };
+    }
+
 
     async readPartial(table, columnOne, columnTwo, valueOne, valueTwo) {
     
@@ -43,6 +38,16 @@ class postgisModel{
         return true;
     };
 
+
+    async readPartialOP(table, min_lon, min_lat, max_lon, max_lat) {
+
+        const { client, postgis } = await postgisconnect();
+        const sql = `SELECT * FROM ${table} WHERE geom && ST_MakeEnvelope($1, $2, $3, $4, 4326)`;
+        const arg = [min_lon, min_lat, max_lon, max_lat,]
+        const result = await client.query(sql, arg)
+        console.log("PART", result.rowCount)
+        return true;
+    };
     /**
     * Select single row based on id
     * @param {table} table 

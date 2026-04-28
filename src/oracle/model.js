@@ -24,7 +24,7 @@ class oracleModel{
     */
     async readPartial(table, columnOne, columnTwo, valueOne, valueTwo) {
         const dbconn = await dbConnectionOracle();
-        const sql = `SELECT * FROM ${table} WHERE ${columnOne} = :1 AND ${columnTwo} = :2`;
+        const sql = `SELECT * FROM ${table} WHERE ${columnOne} = :1 AND ${columnTwo} = ROUND(:2, 6)`;
         const arg = [valueOne, valueTwo];
         const result = await dbconn.execute(sql, arg);
         console.log("PART", result.rows.length)
@@ -55,14 +55,14 @@ class oracleModel{
         return true;
     
     }
-    async insert(table) {
+    async insert(table, path) {
         const dbconn = await dbConnectionOracle();
         const sql = `INSERT INTO ${table} (Severity, State, Precipitation, Windy, Start_Lng, Start_Lat, "Time", "Date") VALUES (:Severity, :State, :Precipitation, :Windy, :Start_Lng, :Start_Lat, :TimeVal, :DateVal)`
         let bulk = [];
         const size = 10000;
         
         return new Promise((resolve, reject)=>{
-            fs.createReadStream("/data/dataTwentyFive.csv")
+            fs.createReadStream(`/data/${path}.csv`)
             .pipe(csv())
             .on("data", async (row)=>{
                 bulk.push({

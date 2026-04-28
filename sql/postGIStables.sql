@@ -22,4 +22,4 @@ CREATE TABLE IF NOT EXISTS optimized(
     Geo_text VARCHAR(200)
 );
 
-CREATE INDEX Severity_idx ON optimized(Severity);
+CREATE INDEX Geo_idx ON optimized(Geo);

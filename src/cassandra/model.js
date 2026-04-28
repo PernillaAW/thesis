@@ -39,10 +39,16 @@ class cassandraModel{
     */
     async readPartial(table, columnOne, columnTwo, valueOne, valueTwo) {
         const conn = await cassandraConnect();
-        const sql = `SELECT * FROM ${table} WHERE ${columnOne} = ? AND ${columnTwo} = ?;`;
+        const sql = `SELECT * FROM ${table} WHERE ${columnOne} = ? AND ${columnTwo} = ? ALLOW FILTERING`;
         const arg = [Number(valueOne), valueTwo];
-        const result = await conn.execute(sql, arg, {prepare:true});
-        console.log(result.rows.length);
+        let pageState = null;
+        let totalRows = 0;
+        do{
+            const result = await conn.execute(sql, arg, {fetchSize:5000, pageState: pageState});
+            totalRows += result.rows.length;
+            pageState = result.pageState;
+        } while (pageState);
+        console.log(totalRows);
         return true;
     };
 
@@ -58,8 +64,8 @@ class cassandraModel{
         await this.init();
         const limit = pLimit(4);
 
-        const start = startTime;
-        const end = endTime ;
+        const start = types.LocalTime.fromString(startTime);
+        const end = types.LocalTime.fromString(endTime);
 
         const queries = this.cachedDates.map(date =>
             limit(() =>
@@ -117,14 +123,14 @@ class cassandraModel{
     * @param {path} path to file
     * @param {table} table 
     */
-    async insert(table) {
+    async insert(table, path) {
         const limit = pLimit(50);
         const conn = await cassandraConnect();
         const sql = `INSERT INTO ${table}(id, severity, state, precipitation, windy, start_lng, start_lat, date, time) VALUES (?, ?, ?, ?, ?, ?, ?, ?,?);`;
         let count = 0;
         let tasks = [];
         const size = 1000;
-        const stream = fs.createReadStream('/data/dataTwentyFive.csv').pipe(csv());
+        const stream = fs.createReadStream(`/data/${path}.csv`).pipe(csv());
         for await (const row of stream){
             const timePart = row.Time.split(' ')[1];
 
@@ -145,6 +151,63 @@ class cassandraModel{
                     ],
                     {prepare:true}))
             );
+            if(tasks.length>= size){
+                await Promise.all(tasks);
+                tasks = [];
+            }}
+        const result = await Promise.all(tasks);
+        console.log(count);
+        return true;
+
+    }
+
+    /**
+    * Insert the cvs file to database
+    * @param {path} path to file
+    * @param {table_time} table 
+    * @param {table_id} table 
+    */
+    async insertOptimized(table_time, table_id, path) {
+        const limit = pLimit(50);
+        const conn = await cassandraConnect();
+        const sql_time = `INSERT INTO ${table_time}(id, severity, state, precipitation, windy, start_lng, start_lat, date, time) VALUES (?, ?, ?, ?, ?, ?, ?, ?,?);`;
+        const sql_id = `INSERT INTO ${table_id}(id, severity, state, precipitation, windy, start_lng, start_lat, date, time) VALUES (?, ?, ?, ?, ?, ?, ?, ?,?);`;
+        let count = 0;
+        let tasks = [];
+        const size = 1000;
+        const stream = fs.createReadStream(`/data/${path}.csv`).pipe(csv());
+        for await (const row of stream){
+            const cassandraTime = row.Time.split(' ')[1];
+
+            const id = count++;
+            tasks.push(
+                limit(()=>
+                conn.execute(sql_time,[
+                    id,
+                    Number(row.Severity),
+                    row.State,
+                    parseFloat(row.Precipitation),
+                    Number(row.Windy),
+                    parseFloat(row.Start_Lng),
+                    parseFloat(row.Start_Lat),
+                    types.LocalDate.fromString(row.Date),
+                    cassandraTime
+                    ],
+                    {prepare:true}),
+                    conn.execute(sql_id,[
+                    id,
+                    Number(row.Severity),
+                    row.State,
+                    parseFloat(row.Precipitation),
+                    Number(row.Windy),
+                    parseFloat(row.Start_Lng),
+                    parseFloat(row.Start_Lat),
+                    types.LocalDate.fromString(row.Date),
+                    cassandraTime
+                    ],
+                    {prepare:true})),           
+            );
+
             if(tasks.length>= size){
                 await Promise.all(tasks);
                 tasks = [];

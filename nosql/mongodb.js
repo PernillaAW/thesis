@@ -38,4 +38,4 @@ db.createCollection("optimized", {
 })
 
 //Remember to add descition to unoptimized calls.
-db.optimized.createIndex({id: 1})
+db.optimized.createIndex({id: 1, Windy: 1, Severity: 1 })

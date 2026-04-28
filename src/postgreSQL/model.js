@@ -60,11 +60,11 @@ async delete(table) {
  * @param {path} path to file
  * @param {table} table 
  */
-async insert(table) {
+async insert(table, path) {
     const client = await connectPostgre();
     const copySQl = `COPY ${table} (Severity,State,Precipitation,Windy,Start_Lat,Start_Lng,Date,Time) 
-    FROM '/data/dataTwentyFive.csv'
-    WITH (FORMAT csv, HEADER true, DELIMITER ',' );`;
+    FROM '/data/${path}.csv'
+    WITH (FORMAT csv, HEADER true, DELIMITER ',' )`;
     const result = await client.query(copySQl);
     console.log("insert", result.rowCount)
     return true
