@@ -14,7 +14,7 @@ class mongodbModel{
         const databaseCollection = db.collection(collection);
         const result = await databaseCollection.find({}).toArray();   
         console.log("READ ALL", result.length) 
-        return result;
+        return true;
     }
 
     /**
@@ -26,13 +26,12 @@ class mongodbModel{
     * @param {valueTwo} valueTwo specified for search
     */
     async readPartial(collection, columnA, columnB, valueA, valueB) {
-        console.log(columnA, columnB, valueA, valueB)
         const db = await mongoDatabase();
         const databaseCollection = db.collection(collection) 
         const query = { [columnA]: valueA, [columnB]: valueB }
         const result = await databaseCollection.find(query).toArray();
         console.log("READ PART", result.length)
-        return result;
+        return true;
     }
 
     /**
@@ -44,7 +43,7 @@ class mongodbModel{
         const databaseCollection = db.collection(collection) 
         const result = await databaseCollection.findOne({id: 5000});
         console.log("READ ONE", result)
-        return result;
+        return true;
     }
 
     /**
@@ -56,7 +55,7 @@ class mongodbModel{
         const databaseCollection = db.collection(collection) 
         const result = await databaseCollection.drop()
         console.log("DELETE", result.length)
-        return result;
+        return true;
     
     }
 

@@ -2,6 +2,7 @@ import subprocess
 import time
 import requests
 import csv
+import re
 """
 BASIC:
 "-d", '{"collection":"unoptimized", "columnOne": "Severity", "columnTwo": "State", "valueOne":"2", "valueTwo":"SC"}',
@@ -34,7 +35,7 @@ Workload A, B, C:
 def main():
     results = []
     count = 0;
-    for i in range(2):  
+    for i in range(10):  
         print("RUN ", count)
         insert = subprocess.run(
                                 ["sudo", 
@@ -49,17 +50,29 @@ def main():
                                 "-X", 
                                 "POST",
                                 "-H", "Content-Type: application/json",
-                                "-d", '{"collectionTime":"optimizedbytime", "collectionId":"optimizedbyid", "path": "dataC"}',
+                                "-d", '{"collection":"unoptimized", "path": "dataC"}',
                                 "http://localhost:3000/insert"],
                                 capture_output=True,
                                 text=True)
         print("Insert done")
         print(insert.stderr)
+        subprocess.run([   "curl",
+                                "-s",
+                                "-o",
+                                "/dev/null",
+                                "-X", 
+                                "POST",
+                                "-H", "Content-Type: application/json",
+                                "-d", '{"collection":"unoptimize"}',
+                                "http://localhost:3000/postgisdrop"],
+                                capture_output=True,
+                                text=True)
         energy, times = retreive_values(insert.stderr)
         results.append({"Run": count,
                         "Operation": "insert",
                         "Energy": energy,
                         "Time": times})
+        ""
         time.sleep(60)
         read_all = subprocess.run (["sudo", 
                                 "perf", 
@@ -73,7 +86,7 @@ def main():
                                 "-X", 
                                 "POST",
                                 "-H", "Content-Type: application/json",
-                                "-d", '{"collection":"optimizedbytime"}',
+                                "-d", '{"collection":"unoptimized"}',
                                 "http://localhost:3000/read_all"],
                                 capture_output=True,
                                 text=True)
@@ -86,7 +99,7 @@ def main():
                         "Energy": energy,
                         "Time": times})   
         time.sleep(60)
-
+        
         partial = subprocess.run (["sudo", 
                                 "perf", 
                                 "stat", 
@@ -99,8 +112,8 @@ def main():
                                 "/dev/null",
                                 "-X", 
                                 "POST",
-                                "-H", "Content-Type: application/json",
-                                "-d", '{"collection":"optimizedbytime", "valueOne": "17:52:00", "valueTwo": "18:29:00"}',
+                                "-H", "Content-Type: application/json", 
+                                "-d", '{"collection":"unoptimized", "columnOne": "Severity", "columnTwo": "State", "valueOne":"2", "valueTwo":"SC"}',
                                 "http://localhost:3000/read_partial"],
                                 capture_output=True,
                                 text=True)
@@ -122,7 +135,7 @@ def main():
                                 "-X", 
                                 "POST",
                                 "-H", "Content-Type: application/json",
-                                "-d", '{"collection":"optimizedbyid"}',
+                                "-d", '{"collection":"unoptimized"}',
                                 "http://localhost:3000/read_one"],
                                 capture_output=True,
                                 text=True)
@@ -149,17 +162,18 @@ def main():
                                 "-X", 
                                 "POST",
                                 "-H", "Content-Type: application/json",
-                                "-d", '{"collection":"optimizedbytime"}',
+                                "-d", '{"collection":"unoptimized"}',
                                 "http://localhost:3000/delete"],
                                 capture_output=True,
                                 text=True)
-        print("Delete done") 
+        print("Delete done")
         print(delete.stderr)
         energy, times = retreive_values(delete.stderr)
         results.append({"Run": count,
                         "Operation": "delete",
                         "Energy": energy,
                         "Time": times}) 
+        
         count += 1
     summary = calc_min_max_average(results)
     write_csv_wide(results, summary)
@@ -174,9 +188,11 @@ def retreive_values(perf_reading):
     for line in lines:
         
         if "Joules" in line:
-            value = line.split()[0]
-            value = value.replace('\u202f', '').replace(',', '.')
-            energy = float(value)
+            match = re.search(r'([\d\u202f,\.]+)\s+Joules', line)
+            if match:
+                value = match.group(1)
+                value = value.replace('\u202f', '').replace(',', '.')
+                energy = float(value)
 
         if "seconds time elapsed" in line or "seconds" in line:
             parts = line.split()
@@ -232,7 +248,7 @@ def pivot_results(result):
 def write_csv_wide(result, summery):
     pivot, runs = pivot_results(result)
 
-    with open("test.csv", "w", newline="") as f:
+    with open("Oracle_test.csv", "w", newline="") as f:
 
         fieldnames = (
             ["Operation"] +

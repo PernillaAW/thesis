@@ -39,12 +39,12 @@ class cassandraModel{
     */
     async readPartial(table, columnOne, columnTwo, valueOne, valueTwo) {
         const conn = await cassandraConnect();
-        const sql = `SELECT * FROM ${table} WHERE ${columnOne} = ? AND ${columnTwo} = ? ALLOW FILTERING`;
+        const sql = `SELECT * FROM thesis.${table} WHERE ${columnOne} = ? AND ${columnTwo} = ? ALLOW FILTERING`;
         const arg = [Number(valueOne), valueTwo];
         let pageState = null;
         let totalRows = 0;
         do{
-            const result = await conn.execute(sql, arg, {fetchSize:5000, pageState: pageState});
+            const result = await conn.execute(sql, arg, {prepare: true, fetchSize:5000, pageState: pageState});
             totalRows += result.rows.length;
             pageState = result.pageState;
         } while (pageState);
@@ -118,6 +118,20 @@ class cassandraModel{
         console.log("DELETED");
         return true;
     }
+    /**
+    * Delete the table and release memory space.
+    * @param {table} table 
+    * */
+    async delete(table, tableTwo) {
+            const conn = await cassandraConnect();
+            const sql = `TRUNCATE TABLE ${table}`;
+            const sqlTwo = `TRUNCATE TABLE ${tableTwo}`;
+            await conn.execute(sql);
+            await conn.execute(sqlTwo);
+            console.log("DELETED");
+            return true;
+        }
+
     /**
     * Insert the cvs file to database
     * @param {path} path to file

@@ -14,6 +14,9 @@
         - ./:/app
         - /app/node_modules
         - /var/run/dbus:/var/run/dbus
+      mem_limit: 4g
+      environment:
+      - NODE_OPTIONS=--max-old-space-size=3500
       #depends_on:
         #postgres:
           #condition: service_healthy
@@ -76,6 +79,7 @@
         retries: 5
 
     mongodb:
+      cpuset: "0-3"
       profiles: ["mongodb"]
       container_name: mongodb
       image: mongo:4.2.3-bionic

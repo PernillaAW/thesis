@@ -24,7 +24,7 @@ class oracleModel{
     */
     async readPartial(table, columnOne, columnTwo, valueOne, valueTwo) {
         const dbconn = await dbConnectionOracle();
-        const sql = `SELECT * FROM ${table} WHERE ${columnOne} = :1 AND ${columnTwo} = ROUND(:2, 6)`;
+        const sql = `SELECT * FROM ${table} WHERE ${columnOne} = :1 AND ${columnTwo} = :2`;
         const arg = [valueOne, valueTwo];
         const result = await dbconn.execute(sql, arg);
         console.log("PART", result.rows.length)

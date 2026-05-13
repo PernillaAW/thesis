@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS unoptimized(
-    id SERIAL PRIMARY KEY,
+    id SERIAL,
     Severity INT,
     State VARCHAR(2),
     Precipitation FLOAT, 

@@ -8,23 +8,11 @@ class postgisModel{
     * @param {table} table 
     */
     async readAll(table) {
-        const { client, postgis } = await postgisconnect();
-        let lastId = 0;
-        let rows;
-
-        do {
-            rows = await client.query(
-                `SELECT FROM ${table} WHERE id > $1 ORDER BY id LIMIT 5000`,
-                [lastId]
-            );
-            if (rows.rows.length > 0) {
-                lastId = rows.rows[rows.rows.length - 1].id;
-            }
-
-        } while (rows.rows.length > 0);
-
-        console.log("ALL", lastId)
-        return true;
+    const client = await connectPostgre();
+    const sql = `SELECT * FROM ${table}`
+    await client.query(sql);
+    console.log("READ ALL")
+    return true;
     }
 
 
@@ -42,7 +30,7 @@ class postgisModel{
     async readPartialOP(table, min_lon, min_lat, max_lon, max_lat) {
 
         const { client, postgis } = await postgisconnect();
-        const sql = `SELECT * FROM ${table} WHERE geom && ST_MakeEnvelope($1, $2, $3, $4, 4326)`;
+        const sql = `SELECT * FROM ${table} WHERE geo && ST_MakeEnvelope($1, $2, $3, $4, 4326)`;
         const arg = [min_lon, min_lat, max_lon, max_lat,]
         const result = await client.query(sql, arg)
         console.log("PART", result.rowCount)
@@ -78,16 +66,44 @@ class postgisModel{
     * @param {path} path to file
     * @param {table} table 
     */
-    async insert(table) {
+    async insert(table, path) {
+        const client = await connectPostgre();
+        const copySQl = `COPY ${table} (Severity,State,Precipitation,Windy,Start_Lat,Start_Lng,Date,Time) 
+        FROM '/data/${path}.csv'
+        WITH (FORMAT csv, HEADER true, DELIMITER ',' )`;
+        const result = await client.query(copySQl);
+        console.log("insert", result.rowCount)
+        return true
+    }
+
+        /**
+    * Insert the cvs file to database
+    * @param {path} path to file
+    * @param {table} table 
+    */
+    async insertOptimised(table, path) {
         const { client, postgis } = await postgisconnect();
-        const copySQl = `COPY ${table}(Severity, State, Precipitation, Windy, Geo_text, Start_time, End_time) 
+        const copySQl = `COPY optimized_scarp(Severity, State, Precipitation, Windy, Geo_text, Start_time, End_time) 
         FROM '/data/postgis.csv'
         DELIMITER ',' 
         CSV HEADER`;
-        await client.query(copySQl)
-        //await client.query(`UPDATE ${table} SET Geo = ST_GeomFromText(Geo_text, 4326)`);
-        //await client.query(`ALTER TABLE ${table} DROP COLUMN Geo_text`)
+        const res = await client.query(copySQl)
+
+        const copyScrap = `INSERT INTO optimized (Severity, State, Precipitation, Windy, Geo, Start_time, End_time)
+        SELECT Severity::integer, State, Precipitation::float, Windy::boolean, ST_GeomFromText(Geo_text, 4326), Start_time::timestamp, End_time::timestamp
+        FROM optimized_scarp;`
+
+        const result = await client.query(copyScrap)
+        console.log("insert", result.rowCount)
+        return true
     } 
+
+    async dropScrap(){
+        const { client, postgis } = await postgisconnect();
+        const sql = `TRUNCATE TABLE optimized_scarp`
+        const res = client.query(sql)
+        return true
+    }
 }
 
 export default postgisModel
