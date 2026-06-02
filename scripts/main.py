@@ -16,10 +16,8 @@ Workload B and C:
 FOR OPTIMIZED GIS:
 Workload A
 "-d", '{"collection":"optimized", "valueOne":24.54, "valueTwo":-81.9, "valueThree":27.7, "valueFour":-78.7}',
-Workload B
+Workload B And C
 "-d", '{"collection":"optimized", "valueOne":28.34, "valueTwo":-99.68, "valueThree":32.3, "valueFour":-95.72}',
-Workload C
-"-d", '{"collection":"optimized", "valueOne":33.8, "valueTwo":-118.46, "valueThree":34.32, "valueFour":-117.94}',
 
 
 FOR OPTIMIZED ORACLE:
