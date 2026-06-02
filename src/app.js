@@ -1,5 +1,5 @@
 import express from 'express';
-//import { preprocessing } from './postgis/preprocess.js';
+import { preprocessing } from './postgis/preprocess.js';
 
 import routes from '../routes/routes.js';
 
@@ -11,4 +11,4 @@ app.use('/', routes);
 
 app.listen(3000, () => console.log(`Server running on 3000`));
 
-//preprocessing("dataC.csv")
+preprocessing("dataB.csv")

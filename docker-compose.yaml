@@ -17,9 +17,9 @@
       mem_limit: 4g
       environment:
       - NODE_OPTIONS=--max-old-space-size=3500
-      #depends_on:
-        #postgres:
-          #condition: service_healthy
+      depends_on:
+        postgis:
+          condition: service_healthy
     postgres:
       cpuset: "0-3"
       profiles: ["postgres"]

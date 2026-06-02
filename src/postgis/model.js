@@ -8,7 +8,7 @@ class postgisModel{
     * @param {table} table 
     */
     async readAll(table) {
-    const client = await connectPostgre();
+    const { client, postgis } = await postgisconnect();
     const sql = `SELECT * FROM ${table}`
     await client.query(sql);
     console.log("READ ALL")
@@ -67,7 +67,7 @@ class postgisModel{
     * @param {table} table 
     */
     async insert(table, path) {
-        const client = await connectPostgre();
+        const { client, postgis } = await postgisconnect();
         const copySQl = `COPY ${table} (Severity,State,Precipitation,Windy,Start_Lat,Start_Lng,Date,Time) 
         FROM '/data/${path}.csv'
         WITH (FORMAT csv, HEADER true, DELIMITER ',' )`;
@@ -89,9 +89,9 @@ class postgisModel{
         CSV HEADER`;
         const res = await client.query(copySQl)
 
-        const copyScrap = `INSERT INTO optimized (Severity, State, Precipitation, Windy, Geo, Start_time, End_time)
-        SELECT Severity::integer, State, Precipitation::float, Windy::boolean, ST_GeomFromText(Geo_text, 4326), Start_time::timestamp, End_time::timestamp
-        FROM optimized_scarp;`
+    const copyScrap = `INSERT INTO optimized (Severity, State, Precipitation, Windy, Geo, Start_time, End_time)
+        SELECT Severity::integer, State, Precipitation::float, Windy::integer, ST_GeomFromText(Geo_text, 4326), Start_time::timestamp, End_time::timestamp
+        FROM optimized_scarp`;
 
         const result = await client.query(copyScrap)
         console.log("insert", result.rowCount)

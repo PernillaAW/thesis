@@ -8,6 +8,7 @@ class oracleModel{
     * @param {table} table 
     */
     async readAll(table) {
+        console.log("Model read_all");
         const dbconn = await dbConnectionOracle();
         const sql = `SELECT * FROM ${table}`;
         const result = await dbconn.execute(sql);
@@ -37,7 +38,7 @@ class oracleModel{
     */
     async readOne(table) {
         const dbconn = await dbConnectionOracle();
-        const sql = `SELECT * FROM ${table} WHERE id = 1`
+        const sql = `SELECT * FROM ${table} WHERE id = 5000`
         const result = await dbconn.execute(sql)
         console.log("ONE", result.rows.length)
         return true;
@@ -99,6 +100,7 @@ class oracleModel{
             })
             .on("error", reject);
         });
+
     }
 
 }

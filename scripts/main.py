@@ -30,6 +30,8 @@ FOR OPTIMIZED MONGODB & POSTGREE:
 Workload A, B, C:
 "-d", '{"collection":"optimized", "columnOne": "Windy", "columnTwo": "Severity", "valueOne":0, "valueTwo":4}',
 
+        
+
 """
 
 def main():
@@ -50,12 +52,18 @@ def main():
                                 "-X", 
                                 "POST",
                                 "-H", "Content-Type: application/json",
-                                "-d", '{"collection":"unoptimized", "path": "dataC"}',
+                                "-d", '{"collection":"optimized", "path": "dataB"}',
                                 "http://localhost:3000/insert"],
                                 capture_output=True,
                                 text=True)
         print("Insert done")
         print(insert.stderr)
+
+        energy, times = retreive_values(insert.stderr)
+        results.append({"Run": count,
+                        "Operation": "insert",
+                        "Energy": energy,
+                        "Time": times})
         subprocess.run([   "curl",
                                 "-s",
                                 "-o",
@@ -63,16 +71,10 @@ def main():
                                 "-X", 
                                 "POST",
                                 "-H", "Content-Type: application/json",
-                                "-d", '{"collection":"unoptimize"}',
+                                "-d", '{"collection":"optimized"}',
                                 "http://localhost:3000/postgisdrop"],
                                 capture_output=True,
                                 text=True)
-        energy, times = retreive_values(insert.stderr)
-        results.append({"Run": count,
-                        "Operation": "insert",
-                        "Energy": energy,
-                        "Time": times})
-        ""
         time.sleep(60)
         read_all = subprocess.run (["sudo", 
                                 "perf", 
@@ -86,7 +88,7 @@ def main():
                                 "-X", 
                                 "POST",
                                 "-H", "Content-Type: application/json",
-                                "-d", '{"collection":"unoptimized"}',
+                                "-d", '{"collection":"optimized"}',
                                 "http://localhost:3000/read_all"],
                                 capture_output=True,
                                 text=True)
@@ -112,8 +114,8 @@ def main():
                                 "/dev/null",
                                 "-X", 
                                 "POST",
-                                "-H", "Content-Type: application/json", 
-                                "-d", '{"collection":"unoptimized", "columnOne": "Severity", "columnTwo": "State", "valueOne":"2", "valueTwo":"SC"}',
+                                "-H", "Content-Type: application/json",
+                                "-d", '{"collection":"optimized", "valueOne":33.8, "valueTwo":-118.46, "valueThree":34.32, "valueFour":-117.94}',
                                 "http://localhost:3000/read_partial"],
                                 capture_output=True,
                                 text=True)
@@ -135,7 +137,7 @@ def main():
                                 "-X", 
                                 "POST",
                                 "-H", "Content-Type: application/json",
-                                "-d", '{"collection":"unoptimized"}',
+                                "-d", '{"collection":"optimized"}',
                                 "http://localhost:3000/read_one"],
                                 capture_output=True,
                                 text=True)
@@ -162,7 +164,7 @@ def main():
                                 "-X", 
                                 "POST",
                                 "-H", "Content-Type: application/json",
-                                "-d", '{"collection":"unoptimized"}',
+                                "-d", '{"collection":"optimized"}',
                                 "http://localhost:3000/delete"],
                                 capture_output=True,
                                 text=True)
@@ -248,7 +250,7 @@ def pivot_results(result):
 def write_csv_wide(result, summery):
     pivot, runs = pivot_results(result)
 
-    with open("Oracle_test.csv", "w", newline="") as f:
+    with open("OPTIMISED_V2_POSTGIS_WB.csv", "w", newline="") as f:
 
         fieldnames = (
             ["Operation"] +
